@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="icons">
+   <file alias="logo.png">resources/images/quetzalcoatlus_icon_512x512.png</file>
+</qresource>
+<qresource prefix="splash">
+   <file alias="splash.jpg">resources/images/quetzalcoatlus_865px.jpg</file>
+</qresource>
+</RCC>
