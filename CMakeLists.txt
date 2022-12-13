@@ -1,12 +1,6 @@
 
-
 cmake_minimum_required(VERSION 3.14)
 
-
-# 'wrapper' Makefile provides this.
-# execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/version.sh -s print
-#     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-#     OUTPUT_VARIABLE QUETZALCOATLUS_VERSION)
 
 if(NOT DEFINED QUETZALCOATLUS_VERSION)
     set(QUETZALCOATLUS_VERSION "v0.0.0-alpha")
@@ -91,6 +85,9 @@ target_link_libraries(quetzalcoatlus PUBLIC
 
 # to test how it would work when compiled on a platform with no tray icon support
 #target_compile_definitions(quetzalcoatlus PUBLIC QT_NO_SYSTEMTRAYICON=1)
+
+# test passing in configuration define via CMake
+#target_compile_definitions(quetzalcoatlus PUBLIC QUETZALCOATLUS_USE_SPLASH_SCREEN=0)
 
 
 # debug:
