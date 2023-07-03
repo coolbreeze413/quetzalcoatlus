@@ -57,6 +57,8 @@ GIT_HASH := $(shell git rev-parse --short HEAD)
 ifeq ($(GIT_HASH),)
 GIT_HASH := zyxwvutsrqponmlkjihgfedcba
 endif
+
+$(info CURRENT_BRANCH=$(CURRENT_BRANCH))
 # TODO.
 # save to file, if it changes from value in file
 # add this as a rule for running cmake only then....

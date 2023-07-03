@@ -20,7 +20,12 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QFileDialog>
 #include <QDebug>
+
+#include <iostream>
+#include <regex>
+#include <fstream>
 
 Window::Window()
 {
@@ -194,13 +199,38 @@ void Window::createSimpleGroupBox()
     simpleLineEdit = new QLineEdit(tr("This is a Line Edit"));
 
     simpleTextEditLabel = new QLabel(tr("TextEdit"));
-    simpleTextEdit = new QTextEdit;
+    simpleTextEdit = new QTextEdit();
     simpleTextEdit->setPlainText(tr("This is a TextEdit and can have\n"
                                     "two lines or\n"
                                     "three"));
 
+    fileSelectLabel = new QLabel(tr("Select Log File"));
+    fileSelectTextEdit = new QLineEdit();
+    fileSelectTextEdit->setPlaceholderText("Enter Path or Browse to Log File");
+    fileSelectButton = new QPushButton("Browse");    
+    QObject::connect(fileSelectButton, &QPushButton::clicked, this, &Window::selectFile);
+
     simplePushButton = new QPushButton(tr("PushButton"));
-    simplePushButton->setDefault(true);
+    // [1] on button press -> change to "something"
+    // fix the lambda invocation and go further.
+    // [2] on button press -> change button text to next integer starting from 0
+    // use signal-slot, lambda
+    
+    QObject::connect(simplePushButton,
+                     &QPushButton::released,
+                     this,
+                     [simplePushButton]() {
+                        simplePushButton->setText("something");
+                     }
+                    );
+
+    regexPushButton = new QPushButton(tr("regex"));
+    // [3] on button press -> do a regex search for number of errors (integer) in
+    // selected logfilepath content (if logfilepath has been populated)
+    // use the first match only, should be able to match any of the 3 patterns in log file.
+    // use signal-slot, lambda
+    // use c++ std::regex
+    // use c++ std:: file/stream operations to read in the file and parse it.
 
 #ifndef QT_NO_SYSTEMTRAYICON
     simpleCheckBox = new QCheckBox(tr("Minimize To Tray?"));
@@ -219,8 +249,12 @@ void Window::createSimpleGroupBox()
     simpleGroupBoxLayout->addWidget(simpleLineEdit, 2, 1, 1, 4);
     simpleGroupBoxLayout->addWidget(simpleTextEditLabel, 3, 0);
     simpleGroupBoxLayout->addWidget(simpleTextEdit, 3, 1, 2, 4);
-    simpleGroupBoxLayout->addWidget(simplePushButton, 5, 4);
-    simpleGroupBoxLayout->addWidget(simpleCheckBox, 6, 0);
+    simpleGroupBoxLayout->addWidget(fileSelectLabel, 7, 0, 1, 1);
+    simpleGroupBoxLayout->addWidget(fileSelectTextEdit, 7, 1, 1, 3);
+    simpleGroupBoxLayout->addWidget(fileSelectButton, 7, 4, 1, 1);
+    simpleGroupBoxLayout->addWidget(simplePushButton, 8, 4, 1, 1);
+    simpleGroupBoxLayout->addWidget(regexPushButton, 9, 4, 1, 1);
+    simpleGroupBoxLayout->addWidget(simpleCheckBox, 10, 0);
     simpleGroupBoxLayout->setColumnStretch(3, 1);
     simpleGroupBoxLayout->setRowStretch(4, 1);
     simpleGroupBox->setLayout(simpleGroupBoxLayout);
@@ -239,4 +273,13 @@ void Window::createActions()
 
     quitAction = new QAction(tr("&Quit"), this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+}
+
+
+void Window::selectFile() {
+    logfilepath = QFileDialog::getOpenFileName(this,
+                                               "Select Log File",
+                                               QDir::currentPath(),
+                                               "Log Files (*.log);;Text Files (*.txt);;Other Files (*.*)");
+    fileSelectTextEdit->setText(QDir(QDir::currentPath()).filePath(logfilepath));
 }

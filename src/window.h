@@ -40,6 +40,7 @@ private slots:
     void showMessage();
     void messageClicked();
 #endif
+    void selectFile();
 
 private:
     void createSimpleGroupBox();
@@ -66,8 +67,13 @@ private:
 
 
     QPushButton *simplePushButton;
+    QPushButton *regexPushButton;
 
     QCheckBox *simpleCheckBox;
+
+    QLabel* fileSelectLabel;
+    QLineEdit* fileSelectTextEdit;
+    QPushButton* fileSelectButton;
 
 
     QAction *minimizeAction;
@@ -79,6 +85,8 @@ private:
     QSystemTrayIcon *trayIcon;
     QMenu *trayIconMenu;
 #endif // #ifndef QT_NO_SYSTEMTRAYICON
+
+    QString logfilepath;
 };
 
 #endif // #ifndef WINDOW_H
