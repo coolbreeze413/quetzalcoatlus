@@ -43,6 +43,5 @@ int main(int argc, char *argv[])
 #if QUETZALCOATLUS_USE_SPLASH_SCREEN
     QTimer::singleShot(3000, &window, &QWidget::raise); // raise it to front after splash screen is done.
 #endif // #if QUETZALCOATLUS_USE_SPLASH_SCREEN
-
     return app.exec();
 }
