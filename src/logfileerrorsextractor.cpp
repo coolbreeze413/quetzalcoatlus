@@ -6,6 +6,7 @@
 #include <regex>
 
 #include <QDebug>
+#include <QThread>
 
 LogFileErrorsExtractor::LogFileErrorsExtractor(const QString& filePath)
     : m_filePath(filePath)
@@ -16,6 +17,8 @@ LogFileErrorsExtractor::~LogFileErrorsExtractor()
 
 void LogFileErrorsExtractor::doWork()
 {
+    qDebug() << "LogFileErrorsExtractor::doWork in thread" << QThread::currentThreadId();
+
     // lambda for striping the line
     auto stripStringFn = [](const std::string& str) {
         size_t first = str.find_first_not_of(" \t\n\r"); // Find first non-whitespace character
@@ -59,4 +62,6 @@ void LogFileErrorsExtractor::doWork()
         qCritical() << "unable to open filePath" << m_filePath;
         return;
     }
+
+    emit finished();
 }

@@ -49,6 +49,8 @@ private:
     void createTrayIcon();
 #endif
 
+    void runLogFileErrorsExtractorWork(const QString& filePath);
+
     QGroupBox *simpleGroupBox;
     
     QLabel *simpleComboBoxLabel;

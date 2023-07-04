@@ -14,6 +14,9 @@ public:
 
     void doWork();
 
+signals:
+    void finished();
+
 private:
     QString m_filePath;
 };
