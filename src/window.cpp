@@ -219,8 +219,15 @@ void Window::createSimpleGroupBox()
     QObject::connect(simplePushButton,
                      &QPushButton::released,
                      this,
-                     [simplePushButton]() {
-                        simplePushButton->setText("something");
+                     [this]() {
+                         bool ok;
+                         int val = simplePushButton->text().toInt(&ok);
+                         if (ok) {
+                             simplePushButton->setText(QString::number(++val));
+                         } else {
+                             // if previous simplePushButton text was not integer, we start with 0 then
+                             simplePushButton->setText(QString::number(0));
+                         }
                      }
                     );
 
