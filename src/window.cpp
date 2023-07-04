@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include "window.h"
+#include "logfileerrorsextractor.h"
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -22,6 +23,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDebug>
+#include <QThread>
 
 #include <iostream>
 #include <regex>
@@ -67,6 +69,32 @@ Window::Window()
                 desk_rect.height() * 2 / 3);
     // move ourself so that we are centered
     move(desk_rect.width() / 2 - width() / 2 + desk_rect.left(), desk_rect.height() / 2 - height() / 2 + desk_rect.top());
+
+    runLogFileErrorsExtractorWork("/workspace/repos/test_work/quetzalcoatlus/testfiles/test1.log");
+}
+
+void Window::runLogFileErrorsExtractorWork(const QString& filePath)
+{
+    qDebug() << "ui thread" << QThread::currentThreadId();
+
+    LogFileErrorsExtractor* worker = new LogFileErrorsExtractor(filePath);
+    QThread* thread = new QThread;
+
+    // move the worker object to the thread
+    worker->moveToThread(thread);
+
+    // start worker on thread start
+    Q_ASSERT(connect(thread, &QThread::started, worker, &LogFileErrorsExtractor::doWork));
+
+    // finish thread on worker finish
+    Q_ASSERT(connect(worker, &LogFileErrorsExtractor::finished, thread, &QThread::quit));
+
+    // clean dynamically allocated memory
+    Q_ASSERT(connect(worker, &LogFileErrorsExtractor::finished, worker, &QObject::deleteLater));
+    Q_ASSERT(connect(worker, &LogFileErrorsExtractor::finished, thread, &QThread::deleteLater));
+
+    // start the thread
+    thread->start();
 }
 
 void Window::setVisible(bool visible)
@@ -219,8 +247,15 @@ void Window::createSimpleGroupBox()
     QObject::connect(simplePushButton,
                      &QPushButton::released,
                      this,
-                     [simplePushButton]() {
-                        simplePushButton->setText("something");
+                     [this]() {
+                         bool ok;
+                         int val = simplePushButton->text().toInt(&ok);
+                         if (ok) {
+                             simplePushButton->setText(QString::number(++val));
+                         } else {
+                             // if previous simplePushButton text was not integer, we start with 0 then
+                             simplePushButton->setText(QString::number(0));
+                         }
                      }
                     );
 

@@ -49,6 +49,8 @@ set(SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/main.cpp
     ${PROJECT_SOURCE_DIR}/src/window.cpp
     ${PROJECT_SOURCE_DIR}/src/window.h
+    ${PROJECT_SOURCE_DIR}/src/logfileerrorsextractor.cpp
+    ${PROJECT_SOURCE_DIR}/src/logfileerrorsextractor.h
 )
 
 set(QRC_FILES
