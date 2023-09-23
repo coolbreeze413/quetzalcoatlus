@@ -82,12 +82,15 @@ target_link_libraries(quetzalcoatlus PUBLIC
     Qt${QT_VERSION_MAJOR}::Widgets
 )
 
-
+# compile time definitions for target
 # to test how it would work when compiled on a platform with no tray icon support
 #target_compile_definitions(quetzalcoatlus PUBLIC QT_NO_SYSTEMTRAYICON=1)
 
 # test passing in configuration define via CMake
 #target_compile_definitions(quetzalcoatlus PUBLIC QUETZALCOATLUS_USE_SPLASH_SCREEN=0)
+
+# use QGridLayout to layout stuff
+target_compile_definitions(quetzalcoatlus PUBLIC QUETZALCOATLUS_USE_QGRIDLAYOUT=0)
 
 
 # debug:

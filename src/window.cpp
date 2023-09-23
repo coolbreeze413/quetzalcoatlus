@@ -24,6 +24,7 @@
 #include <QMovie>
 #include <QProgressDialog>
 #include <QDebug>
+#include <QSpacerItem>
 
 #include <iostream>
 #include <regex>
@@ -250,6 +251,7 @@ void Window::createSimpleGroupBox()
                         // https://stackoverflow.com/questions/41079412/qt-show-gif-on-qdialog
                         QDialog* gifContainerDialog = new QDialog(this);
                         gifContainerDialog->setWindowModality(Qt::WindowModal);
+                        gifContainerDialog->setWindowTitle("Accretion Disk");
 
                         QVBoxLayout* gifContainerDialogLayout = new QVBoxLayout();
                         gifContainerDialog->setLayout(gifContainerDialogLayout);
@@ -258,6 +260,8 @@ void Window::createSimpleGroupBox()
                         QMovie* selectedGif = new QMovie(":/gif/accretion_disk.gif");
                         gifContainerLabel->setMovie(selectedGif);
                         gifContainerDialogLayout->addWidget(gifContainerLabel);
+
+                        gifContainerDialogLayout->setMargin(0);
 
                         // disallow resizing, but still adjust to content size.
                         // https://stackoverflow.com/questions/696209/non-resizeable-qdialog-with-fixed-size-in-qt
@@ -334,6 +338,9 @@ void Window::createSimpleGroupBox()
     simpleCheckBox = new QCheckBox(tr("CheckBox"));
     simpleCheckBox->setChecked(true);
 #endif // #ifndef QT_NO_SYSTEMTRAYICON
+
+
+#if (QUETZALCOATLUS_USE_QGRIDLAYOUT == 1)
 
     QGridLayout *simpleGroupBoxLayout = new QGridLayout;
     // for simpler manipulation of Grid Layouts, use a bunch of variables
@@ -437,6 +444,87 @@ void Window::createSimpleGroupBox()
 
     // simpleGroupBoxLayout->setColumnStretch(3, 1);
     simpleGroupBox->setLayout(simpleGroupBoxLayout);
+
+#else // #if (QUETZALCOATLUS_USE_QGRIDLAYOUT == 1) --> use hierarchical Box Layouts.
+
+    QVBoxLayout *simpleGroupBoxLayout = new QVBoxLayout();
+
+    QHBoxLayout* simpleComboBoxLayout = new QHBoxLayout();
+    simpleComboBoxLabel->setMinimumWidth(200);
+    simpleComboBoxLayout->addWidget(simpleComboBoxLabel, 1);
+    simpleComboBoxLayout->addWidget(simpleComboBox, 2);
+    //simpleComboBoxLayout->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::MinimumExpanding,QSizePolicy::Minimum));
+    simpleComboBoxLayout->addStretch(17);
+    simpleGroupBoxLayout->addLayout(simpleComboBoxLayout);
+
+    QHBoxLayout* simpleSpinBoxLayout = new QHBoxLayout();
+    simpleSpinBoxLabel->setMinimumWidth(200);
+    simpleSpinBoxLayout->addWidget(simpleSpinBoxLabel, 1);
+    simpleSpinBoxLayout->addWidget(simpleSpinBox, 2);
+    simpleSpinBoxLayout->addStretch(17);
+    simpleGroupBoxLayout->addLayout(simpleSpinBoxLayout);
+
+    QHBoxLayout* simpleLineEditLayout = new QHBoxLayout();
+    simpleLineEditLabel->setMinimumWidth(200);
+    simpleLineEdit->setMinimumWidth(400);
+    simpleLineEditLayout->addWidget(simpleLineEditLabel, 1);
+    simpleLineEditLayout->addWidget(simpleLineEdit, 19);
+    simpleGroupBoxLayout->addLayout(simpleLineEditLayout);
+
+    QHBoxLayout* simpleTextEditLayout = new QHBoxLayout();
+    simpleTextEditLabel->setMinimumWidth(200);
+    simpleTextEdit->setMinimumWidth(400);
+    simpleTextEditLayout->addWidget(simpleTextEditLabel, 1);
+    simpleTextEditLayout->addWidget(simpleTextEdit, 19);
+    simpleGroupBoxLayout->addLayout(simpleTextEditLayout);
+
+    QHBoxLayout* simplePixmapLabelLayout = new QHBoxLayout();
+    simplePixmapLabelLabel->setMinimumWidth(200);
+    simplePixmapLabelLayout->addWidget(simplePixmapLabelLabel, 1);
+    simplePixmapLabelLayout->addWidget(simplePixmapLabel, 2);
+    simplePixmapLabelLayout->addStretch(17);
+    simpleGroupBoxLayout->addLayout(simplePixmapLabelLayout);
+
+    QHBoxLayout* simplePixmapPushButtonLayout = new QHBoxLayout();
+    simplePixmapPushButtonLabel->setMinimumWidth(200);
+    simplePixmapPushButtonLayout->addWidget(simplePixmapPushButtonLabel, 1);
+    simplePixmapPushButtonLayout->addWidget(simplePixmapPushButton, 2);
+    simplePixmapPushButtonLayout->addStretch(17);
+    simpleGroupBoxLayout->addLayout(simplePixmapPushButtonLayout);
+
+    QHBoxLayout* fileSelectLayout = new QHBoxLayout();
+    fileSelectLabel->setMinimumWidth(200);
+    fileSelectTextEdit->setMinimumWidth(400);
+    fileSelectLayout->addWidget(fileSelectLabel, 1);
+    fileSelectLayout->addWidget(fileSelectTextEdit, 18);
+    fileSelectLayout->addWidget(fileSelectButton, 1);
+    simpleGroupBoxLayout->addLayout(fileSelectLayout);
+
+    QHBoxLayout* simplePushButtonLayout = new QHBoxLayout();
+    simplePushButtonLayout->addStretch(19);
+    simplePushButtonLayout->addWidget(simplePushButton, 1);
+    simpleGroupBoxLayout->addLayout(simplePushButtonLayout);
+
+    QHBoxLayout* regexPushButtonLayout = new QHBoxLayout();
+    regexPushButtonLayout->addStretch(19);
+    regexPushButtonLayout->addWidget(regexPushButton, 1);
+    simpleGroupBoxLayout->addLayout(regexPushButtonLayout);
+
+
+    // create a gap between other content and last row:
+    //simpleGroupBoxLayout->addStretch(2);
+    simpleGroupBoxLayout->addSpacerItem(new QSpacerItem(0,100,QSizePolicy::Minimum,QSizePolicy::MinimumExpanding));
+
+
+    QHBoxLayout* simpleCheckBoxLayout = new QHBoxLayout();
+    simpleCheckBoxLayout->addWidget(simpleCheckBox);
+    simpleCheckBoxLayout->addStretch(19);
+    simpleGroupBoxLayout->addLayout(simpleCheckBoxLayout);
+
+    simpleGroupBox->setLayout(simpleGroupBoxLayout);
+
+#endif // #if (QUETZALCOATLUS_USE_QGRIDLAYOUT == 1)
+
 }
 
 
