@@ -21,6 +21,8 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QMovie>
+#include <QProgressDialog>
 #include <QDebug>
 
 #include <iostream>
@@ -54,19 +56,8 @@ Window::Window()
     setWindowTitle(tr("quetzalcoatlus"));
     setWindowIcon(icon);
 
-    // aesthetic: setup the MainWindow to be two-third the area of the screen where it is displayed, centered.
-    QDesktopWidget dw;
-    // support multiple screens correctly.
-    // show() required before windowHandle() is valid!
-    show();
-    // set the screen to be displayed according to the mouse cursor position right now
-    windowHandle()->setScreen(QGuiApplication::screenAt(QCursor::pos()));
-    // set the geometry so that we are approximately 2/3 of the screen size
-    QRect desk_rect = dw.screenGeometry(dw.screenNumber(QCursor::pos()));
-    setGeometry(desk_rect.width() / 6, desk_rect.height() / 6, desk_rect.width() * 2 / 3,
-                desk_rect.height() * 2 / 3);
-    // move ourself so that we are centered
-    move(desk_rect.width() / 2 - width() / 2 + desk_rect.left(), desk_rect.height() / 2 - height() / 2 + desk_rect.top());
+    // finally adjust ourself to position centered and an appropriate size
+    setPositionAndSize();
 }
 
 void Window::setVisible(bool visible)
@@ -76,6 +67,29 @@ void Window::setVisible(bool visible)
     restoreAction->setEnabled(isMaximized() || !visible);
     QMainWindow::setVisible(visible);
 }
+
+
+void Window::setPositionAndSize()
+{
+    // aesthetic: setup the MainWindow to be two-third the area of the screen where it is displayed, centered.
+    QDesktopWidget dw;
+    
+    // support multiple screens correctly.
+    // NOTE: show() required before windowHandle() is valid!
+    show();
+    
+    // set the screen to be displayed according to the mouse cursor position right now
+    windowHandle()->setScreen(QGuiApplication::screenAt(QCursor::pos()));
+    
+    // set the geometry so that we are approximately 2/3 of the screen size
+    QRect desk_rect = dw.screenGeometry(dw.screenNumber(QCursor::pos()));
+    setGeometry(desk_rect.width() / 6, desk_rect.height() / 6, desk_rect.width() * 2 / 3,
+                desk_rect.height() * 2 / 3);
+    
+    // move ourself so that we are centered
+    move(desk_rect.width() / 2 - width() / 2 + desk_rect.left(), desk_rect.height() / 2 - height() / 2 + desk_rect.top());
+}
+
 
 void Window::changeEvent(QEvent *event)
 {
@@ -98,6 +112,7 @@ void Window::changeEvent(QEvent *event)
     }
 }
 
+
 void Window::closeEvent(QCloseEvent *event)
 {
     // close event originated outside application (system event?)
@@ -112,6 +127,7 @@ void Window::closeEvent(QCloseEvent *event)
     }
     QMainWindow::closeEvent(event);
 }
+
 
 #ifndef QT_NO_SYSTEMTRAYICON
 void Window::iconActivated(QSystemTrayIcon::ActivationReason reason)
@@ -130,6 +146,7 @@ void Window::iconActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
+
 void Window::showMessage()
 {
     QSystemTrayIcon::MessageIcon msgIcon = QSystemTrayIcon::MessageIcon(QSystemTrayIcon::Information);
@@ -140,12 +157,14 @@ void Window::showMessage()
                           1 * 1000);
 }
 
+
 void Window::messageClicked()
 {
     QMessageBox::information(nullptr,
                              tr("TITLE"),
                              tr("TEXT"));
 }
+
 
 void Window::createTrayIcon()
 {
@@ -160,6 +179,7 @@ void Window::createTrayIcon()
     trayIcon->setContextMenu(trayIconMenu);
 }
 #endif // #ifndef QT_NO_SYSTEMTRAYICON
+
 
 void Window::createSimpleGroupBox()
 {
@@ -204,33 +224,108 @@ void Window::createSimpleGroupBox()
                                     "two lines or\n"
                                     "three"));
 
+    simplePixmapLabelLabel = new QLabel(tr("PixmapLabel"));
+    simplePixmapLabel = new QLabel();
+    // pixmap from a svg, via QIcon (or use QIcon directly):
+    QPixmap p = QIcon(":/icons/black_hole.svg").pixmap(QSize(93,80)); // use original image w,h or multiple.
+    if(!p.isNull()) {
+        simplePixmapLabel->setPixmap(p);
+    }
+    // QMovie* selectedGif = new QMovie(":/gif/accretion_disk.gif");
+    // simplePixmapLabel->setMovie(selectedGif);
+    // selectedGif->start();
+
+
+    // https://stackoverflow.com/questions/31580362/qt-creating-icon-button
+    simplePixmapPushButtonLabel = new QLabel(tr("PixmapPushButton"));
+    simplePixmapPushButton = new QPushButton();
+    simplePixmapPushButton->setToolTip("Click to view an accretion disk!");
+    simplePixmapPushButton->setIcon(QIcon(":/icons/black_hole.svg"));
+    simplePixmapPushButton->setIconSize(QSize(93,80)); // use original image w,h or multiple.
+    simplePixmapPushButton->setFixedSize(QSize(93+10,80+10));
+    QObject::connect(simplePixmapPushButton, &QPushButton::released,
+                     this,
+                     [this]() {
+
+                        // https://stackoverflow.com/questions/41079412/qt-show-gif-on-qdialog
+                        QDialog* gifContainerDialog = new QDialog(this);
+                        gifContainerDialog->setWindowModality(Qt::WindowModal);
+
+                        QVBoxLayout* gifContainerDialogLayout = new QVBoxLayout();
+                        gifContainerDialog->setLayout(gifContainerDialogLayout);
+
+                        QLabel* gifContainerLabel = new QLabel();
+                        QMovie* selectedGif = new QMovie(":/gif/accretion_disk.gif");
+                        gifContainerLabel->setMovie(selectedGif);
+                        gifContainerDialogLayout->addWidget(gifContainerLabel);
+
+                        // disallow resizing, but still adjust to content size.
+                        // https://stackoverflow.com/questions/696209/non-resizeable-qdialog-with-fixed-size-in-qt
+                        gifContainerDialog->layout()->setSizeConstraint( QLayout::SetFixedSize );
+                        
+                        selectedGif->start();
+                        gifContainerDialog->show();
+                     }
+                    );
+
     fileSelectLabel = new QLabel(tr("Select Log File"));
     fileSelectTextEdit = new QLineEdit();
     fileSelectTextEdit->setPlaceholderText("Enter Path or Browse to Log File");
-    fileSelectButton = new QPushButton("Browse");    
+    fileSelectButton = new QPushButton("Browse");
     QObject::connect(fileSelectButton, &QPushButton::clicked, this, &Window::selectFile);
 
-    simplePushButton = new QPushButton(tr("PushButton"));
-    // [1] on button press -> change to "something"
-    // fix the lambda invocation and go further.
-    // [2] on button press -> change button text to next integer starting from 0
-    // use signal-slot, lambda
-    
-    QObject::connect(simplePushButton,
-                     &QPushButton::released,
+    simplePushButton = new QPushButton(tr("RightPushButton"));
+    QObject::connect(simplePushButton, &QPushButton::released,
                      this,
-                     [simplePushButton]() {
-                        simplePushButton->setText("something");
+                     [this]() { 
+                        if(this->simplePushButton->text() == "RightPushButton") {
+                            this->simplePushButton->setText("0");
+                        }
+                        else {
+                            QString numberstr = this->simplePushButton->text();
+                            int number = numberstr.toInt();
+                            number++;
+                            numberstr = QString::number(number);
+                            this->simplePushButton->setText(numberstr);
+                        }
                      }
                     );
 
     regexPushButton = new QPushButton(tr("regex"));
-    // [3] on button press -> do a regex search for number of errors (integer) in
-    // selected logfilepath content (if logfilepath has been populated)
-    // use the first match only, should be able to match any of the 3 patterns in log file.
-    // use signal-slot, lambda
-    // use c++ std::regex
-    // use c++ std:: file/stream operations to read in the file and parse it.
+    QObject::connect(regexPushButton, &QPushButton::released,
+                     this,
+                     [this]() {
+                        ////// std:: implementation //////
+                        ///// can also do Qt implementation 
+                        std::regex regex;
+                        std::smatch smatches;
+                        bool found;
+                        
+                        if(!logfilepath.isEmpty()) {
+
+                            std::string filecontent;
+
+                            // get it into a ifstream and parse into std::string
+                            std::ifstream stream(logfilepath.toStdString());
+                            if (stream.good()) {
+
+                                filecontent = 
+                                std::string((std::istreambuf_iterator<char>(stream)),
+                                            std::istreambuf_iterator<char>());
+                            }
+                            stream.close();
+
+
+                            regex = std::regex("errors\\s*:\\s*(\\d+)", std::regex::ECMAScript);
+                            found = std::regex_search ( filecontent, smatches, regex );
+                            if(found) {
+                                std::string string_value = smatches.str(1);
+                                std::cout << "found: " << string_value << std::endl;
+                            }
+
+                        }
+                     }
+                    );
 
 #ifndef QT_NO_SYSTEMTRAYICON
     simpleCheckBox = new QCheckBox(tr("Minimize To Tray?"));
@@ -241,24 +336,109 @@ void Window::createSimpleGroupBox()
 #endif // #ifndef QT_NO_SYSTEMTRAYICON
 
     QGridLayout *simpleGroupBoxLayout = new QGridLayout;
-    simpleGroupBoxLayout->addWidget(simpleComboBoxLabel, 0, 0);
-    simpleGroupBoxLayout->addWidget(simpleComboBox, 0, 1, 1, 2);
-    simpleGroupBoxLayout->addWidget(simpleSpinBoxLabel, 1, 0);
-    simpleGroupBoxLayout->addWidget(simpleSpinBox, 1, 1);
-    simpleGroupBoxLayout->addWidget(simpleLineEditLabel, 2, 0);
-    simpleGroupBoxLayout->addWidget(simpleLineEdit, 2, 1, 1, 4);
-    simpleGroupBoxLayout->addWidget(simpleTextEditLabel, 3, 0);
-    simpleGroupBoxLayout->addWidget(simpleTextEdit, 3, 1, 2, 4);
-    simpleGroupBoxLayout->addWidget(fileSelectLabel, 7, 0, 1, 1);
-    simpleGroupBoxLayout->addWidget(fileSelectTextEdit, 7, 1, 1, 3);
-    simpleGroupBoxLayout->addWidget(fileSelectButton, 7, 4, 1, 1);
-    simpleGroupBoxLayout->addWidget(simplePushButton, 8, 4, 1, 1);
-    simpleGroupBoxLayout->addWidget(regexPushButton, 9, 4, 1, 1);
-    simpleGroupBoxLayout->addWidget(simpleCheckBox, 10, 0);
-    simpleGroupBoxLayout->setColumnStretch(3, 1);
-    simpleGroupBoxLayout->setRowStretch(4, 1);
+    // for simpler manipulation of Grid Layouts, use a bunch of variables
+    // which makes it more human friendly to understand and modify:
+    unsigned int row = 0;
+    unsigned int column = 0;
+    unsigned int rowspan = 0;
+    unsigned int columnspan = 0;
+    unsigned int total_columns = 0;
+    unsigned int total_columns_max = 0;
+    // unsigned int entity_max_rowspan = 0; // for more advanced usage, later.
+    
+    // simpleComboBoxLabel and simpleComboBox at same row
+    // simpleComboBoxLabel = 1x1 and simpleComboBox = 1x2
+    row = 0; 
+    column = 0; rowspan = 1; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(simpleComboBoxLabel, row, column, rowspan, columnspan);
+    column = column + columnspan; rowspan = 1; columnspan = 2;
+    simpleGroupBoxLayout->addWidget(simpleComboBox, row, column, rowspan, columnspan);
+    row += rowspan;
+    total_columns = column + columnspan;
+    if(total_columns > total_columns_max) total_columns_max = total_columns;
+
+    column = 0; rowspan = 1; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(simpleSpinBoxLabel, row, column, rowspan, columnspan);
+    column = column + columnspan; rowspan = 1; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(simpleSpinBox, row, column, rowspan, columnspan);
+    row += rowspan;
+    total_columns = column + columnspan;
+    if(total_columns > total_columns_max) total_columns_max = total_columns;
+
+    column = 0; rowspan = 1; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(simpleLineEditLabel, row, column, rowspan, columnspan);
+    column = column + columnspan; rowspan = 1; columnspan = 4;
+    simpleGroupBoxLayout->addWidget(simpleLineEdit, row, column, rowspan, columnspan);
+    row += rowspan;
+    total_columns = column + columnspan;
+    if(total_columns > total_columns_max) total_columns_max = total_columns;
+
+    column = 0; rowspan = 1; columnspan = 1; // set rowspan = 2 if the label should be centered.
+    simpleGroupBoxLayout->addWidget(simpleTextEditLabel, row, column, rowspan, columnspan);
+    column = column + columnspan; rowspan = 2; columnspan = 4;
+    simpleGroupBoxLayout->addWidget(simpleTextEdit, row, column, rowspan, columnspan);
+    row += rowspan;
+    total_columns = column + columnspan;
+    if(total_columns > total_columns_max) total_columns_max = total_columns;
+
+    column = 0; rowspan = 1; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(simplePixmapLabelLabel, row, column, rowspan, columnspan);
+    column = column + columnspan; rowspan = 1; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(simplePixmapLabel, row, column, rowspan, columnspan);
+    row += rowspan;
+    total_columns = column + columnspan;
+    if(total_columns > total_columns_max) total_columns_max = total_columns;
+
+    column = 0; rowspan = 1; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(simplePixmapPushButtonLabel, row, column, rowspan, columnspan);
+    column = column + columnspan; rowspan = 1; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(simplePixmapPushButton, row, column, rowspan, columnspan);
+    row += rowspan;
+    total_columns = column + columnspan;
+    if(total_columns > total_columns_max) total_columns_max = total_columns;
+
+    column = 0; rowspan = 1; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(fileSelectLabel, row, column, rowspan, columnspan);
+    column = column + columnspan; rowspan = 1; columnspan = 3;
+    simpleGroupBoxLayout->addWidget(fileSelectTextEdit, row, column, rowspan, columnspan);
+    column = column + columnspan; rowspan = 1; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(fileSelectButton, row, column, rowspan, columnspan);
+    row += rowspan;
+    total_columns = column + columnspan;
+    if(total_columns > total_columns_max) total_columns_max = total_columns;
+
+    column = total_columns_max - 1; rowspan = 1; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(simplePushButton, row, column, rowspan, columnspan);
+    row += rowspan;
+    total_columns = column + columnspan;
+    if(total_columns > total_columns_max) total_columns_max = total_columns;
+
+    column = total_columns_max - 1; rowspan = 1; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(regexPushButton, row, column, rowspan, columnspan);
+    row += rowspan;
+    total_columns = column + columnspan;
+    if(total_columns > total_columns_max) total_columns_max = total_columns;
+
+
+    // create a gap between other content and last row:
+    // so we add 'blank' labels in there
+    column = 0; rowspan = 2; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(new QLabel(), row, column, rowspan, columnspan);
+    row += rowspan;
+    total_columns = column + columnspan;
+    if(total_columns > total_columns_max) total_columns_max = total_columns;
+
+
+    column = 0; rowspan = 1; columnspan = 1;
+    simpleGroupBoxLayout->addWidget(simpleCheckBox, row, column, rowspan, columnspan);
+    row += rowspan;
+    total_columns = column + columnspan;
+    if(total_columns > total_columns_max) total_columns_max = total_columns;
+
+    // simpleGroupBoxLayout->setColumnStretch(3, 1);
     simpleGroupBox->setLayout(simpleGroupBoxLayout);
 }
+
 
 void Window::createActions()
 {
@@ -280,6 +460,8 @@ void Window::selectFile() {
     logfilepath = QFileDialog::getOpenFileName(this,
                                                "Select Log File",
                                                QDir::currentPath(),
-                                               "Log Files (*.log);;Text Files (*.txt);;Other Files (*.*)");
+                                               "Log Files (*.log);;Text Files (*.txt);;All Files (*.*)",
+                                               nullptr,
+                                               QFileDialog::DontUseNativeDialog);
     fileSelectTextEdit->setText(QDir(QDir::currentPath()).filePath(logfilepath));
 }

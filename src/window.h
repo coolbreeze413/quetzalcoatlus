@@ -4,9 +4,8 @@
 #define WINDOW_H
 
 #include <QSystemTrayIcon>
-
-
 #include <QMainWindow>
+
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -29,6 +28,7 @@ public:
     Window();
 
     void setVisible(bool visible) override;
+    void setPositionAndSize();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -50,21 +50,24 @@ private:
 #endif
 
     QGroupBox *simpleGroupBox;
-    
+
     QLabel *simpleComboBoxLabel;
     QComboBox *simpleComboBox;
 
     QLabel *simpleSpinBoxLabel;
     QSpinBox *simpleSpinBox;
 
-
     QLabel *simpleLineEditLabel;
     QLineEdit *simpleLineEdit;
-
 
     QLabel *simpleTextEditLabel;
     QTextEdit *simpleTextEdit;
 
+    QLabel *simplePixmapLabelLabel;
+    QLabel *simplePixmapLabel;
+
+    QLabel *simplePixmapPushButtonLabel;
+    QPushButton *simplePixmapPushButton;
 
     QPushButton *simplePushButton;
     QPushButton *regexPushButton;
