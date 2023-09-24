@@ -13,6 +13,10 @@
 ^\./bin/quetzalcoatlus$
 ^\./scripts$
 ^\./share/quetzalcoatlus$
+^\./share/applications$
+^\./share/icons$
 ^\./docs/*
-^\./versions.txt$
+^\./versions\.txt$
+^\./quetzalcoatlus\.desktop$
+^\./quetzalcoatlus\.png$
 # end-of-file : do not add further empty lines!

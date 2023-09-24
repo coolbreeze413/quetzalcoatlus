@@ -141,11 +141,15 @@ ifeq ("$(wildcard $(LINUXDEPLOYQT_APPIMAGE_FILE_PATH))","")
 	@wget -q -O $(LINUXDEPLOYQT_APPIMAGE_FILE_PATH) https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
 	@chmod +x $(LINUXDEPLOYQT_APPIMAGE_FILE_PATH)
 endif # if LINUXDEPLOYQT_APPIMAGE_FILE_PATH does not exist
-	@$(LINUXDEPLOYQT_APPIMAGE_FILE_PATH) $(DEPLOY_PACKAGE_DIR_PATH)/usr/bin/quetzalcoatlus -unsupported-allow-new-glibc -no-translations -appimage &> $(CMAKE_SOURCE_DIR)/linuxdeployqt.log || true
+	cd $(DEPLOY_PACKAGE_DIR_PATH) && $(LINUXDEPLOYQT_APPIMAGE_FILE_PATH) $(DEPLOY_PACKAGE_DIR_PATH)/usr/share/applications/quetzalcoatlus.desktop -appimage -no-translations &> $(CMAKE_SOURCE_DIR)/linuxdeployqt.log || true
 
-# create the 'deploy' dir using the 'AppDir' and remove the 'AppImage'
-	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/*.AppImage
+# remove the artifacts from linuxdeployqt
+#@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/*.AppImage
 	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/AppRun
+	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus.desktop
+	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus.png
+	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/.DirIcon
+# rename the 'AppDir'/usr into the application name and this is our 'portable' deploy package
 	@mv $(DEPLOY_PACKAGE_DIR_PATH)/usr $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)
 
 # create a Makeself self-extracting archive

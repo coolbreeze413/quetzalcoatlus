@@ -114,3 +114,21 @@ install(
     DESTINATION
         share/quetzalcoatlus/
 )
+
+install(
+    FILES
+        resources/quetzalcoatlus.desktop
+    DESTINATION
+        share/applications
+    PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
+)
+
+install(
+    FILES
+        resources/images/quetzalcoatlus_icon_256x256.png
+    DESTINATION
+        share/icons/hicolor/256x256/apps
+    RENAME
+        quetzalcoatlus.png
+    PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
+)
