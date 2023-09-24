@@ -103,7 +103,14 @@ target_compile_definitions(quetzalcoatlus PUBLIC QUETZALCOATLUS_USE_QGRIDLAYOUT=
 
 
 install(TARGETS quetzalcoatlus
-    RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/lib
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/lib
+    RUNTIME DESTINATION bin
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+)
+
+install(
+    DIRECTORY
+        testfiles
+    DESTINATION
+        share/quetzalcoatlus/
 )

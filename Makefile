@@ -8,8 +8,9 @@ MAKEFILE_DIR_NAME := $(notdir $(MAKEFILE_DIR_PATH))
 # $(info MAKEFILE_DIR_NAME=$(MAKEFILE_DIR_NAME))
 # $(info )
 
-# todo: are we re-inventing the wheel?
+
 # build platform detection to make Makefile logic easier later
+# todo: are we re-inventing the wheel?
 BUILD_PLATFORMS=
 BUILD_PLATFORMS+=WIN32_MINGW64
 BUILD_PLATFORMS+=LINUX
@@ -28,8 +29,8 @@ CURRENT_BUILD_PLATFORM=LINUX
 SHELL := /bin/bash
 endif # ifeq ($(OS),Windows_NT)
 
-
 $(info CURRENT_BUILD_PLATFORM=$(CURRENT_BUILD_PLATFORM))
+$(info OS=$(OS))
 
 
 ADDITIONAL_CMAKE_OPTIONS ?=
@@ -42,6 +43,7 @@ CMAKE_SOURCE_DIR := $(MAKEFILE_DIR_PATH)
 PREFIX ?= $(MAKEFILE_DIR_PATH)/install
 
 CURRENT_DATE := $(shell date "+%d_%b_%Y")
+CURRENT_DATE_FULL := $(shell date "+%d_%B_%Y")
 CURRENT_TIME := $(shell date +"%H_%M_%S")
 
 # we will use the last tag of the following format for using in the deployment package:
@@ -53,16 +55,22 @@ VERSION := $(shell git tag -l | grep -o "^v.*\..*\..*-[a-z]*" | sort -V | tail -
 ifeq ($(VERSION),)
 VERSION := v0.0.0-alpha
 endif
+
 GIT_HASH := $(shell git rev-parse --short HEAD)
 ifeq ($(GIT_HASH),)
 GIT_HASH := zyxwvutsrqponmlkjihgfedcba
 endif
 
+CURRENT_BRANCH := $(shell git symbolic-ref HEAD --short 2>/dev/null || echo "no_branch")
+
 $(info CURRENT_BRANCH=$(CURRENT_BRANCH))
-# TODO.
-# save to file, if it changes from value in file
-# add this as a rule for running cmake only then....
-# TODO. use python for parsing instead of bash?
+
+
+DEPLOY_PACKAGE_DIR_PATH := $(CMAKE_SOURCE_DIR)/deploy
+LINUXDEPLOYQT_APPIMAGE_FILE_PATH := $(CMAKE_BUILD_DIR)/linuxdeployqt-continuous-x86_64.AppImage
+MAKESELF_2_3_1_FILE_PATH := $(CMAKE_BUILD_DIR)/makeself-2.3.1/makeself.sh
+# win32 style paths, convert using cygpath:
+DEPLOY_PACKAGE_DIR_PATH_W=$(shell cygpath -w "$(DEPLOY_PACKAGE_DIR_PATH)" | sed 's/\\/\\\\/g')
 
 
 .DEFAULT_GOAL := all
@@ -111,6 +119,46 @@ update:
 	git fetch
 	git submodule update --init --recursive
 
+# https://github.com/AppImage/AppImageKit/wiki/AppDir
+.PHONY: deploy
+deploy: install
+ifeq ($(CURRENT_BUILD_PLATFORM),WIN32_MINGW64)
+
+	$(error deploy on $(CURRENT_BUILD_PLATFORM) is not supported yet!)
+
+else ifeq ($(CURRENT_BUILD_PLATFORM),LINUX)
+
+# create a fresh 'AppDir' : $(DEPLOY_PACKAGE_DIR_PATH)/usr/bin and $(DEPLOY_PACKAGE_DIR_PATH)/usr/lib
+	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)
+	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)/usr
+# copy the build into the 'AppDir'/usr, use a filter as needed, to put stuff into the deploy package
+	@cd $(PREFIX) && find . | grep -f $(CMAKE_SOURCE_DIR)/deployment_filter.txt | xargs -d '\n' cp -r --parents -t $(DEPLOY_PACKAGE_DIR_PATH)/usr
+# copy docs into 'AppDir'/usr/docs
+
+# create 'AppImage' using linuxdeployqt
+	@echo "creating deployment package using linuxdeployqt..."
+ifeq ("$(wildcard $(LINUXDEPLOYQT_APPIMAGE_FILE_PATH))","")
+	@wget -q -O $(LINUXDEPLOYQT_APPIMAGE_FILE_PATH) https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+	@chmod +x $(LINUXDEPLOYQT_APPIMAGE_FILE_PATH)
+endif # if LINUXDEPLOYQT_APPIMAGE_FILE_PATH does not exist
+	@$(LINUXDEPLOYQT_APPIMAGE_FILE_PATH) $(DEPLOY_PACKAGE_DIR_PATH)/usr/bin/quetzalcoatlus -unsupported-allow-new-glibc -no-translations -appimage &> $(CMAKE_SOURCE_DIR)/linuxdeployqt.log || true
+
+# create the 'deploy' dir using the 'AppDir' and remove the 'AppImage'
+	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/*.AppImage
+	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/AppRun
+	@mv $(DEPLOY_PACKAGE_DIR_PATH)/usr $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)
+
+# create a Makeself self-extracting archive
+	@echo "creating self-extracting archive using makeself..."
+ifeq ("$(wildcard $(MAKESELF_2_3_1_FILE_PATH))","")
+	@cd $(CMAKE_BUILD_DIR) && wget -q https://github.com/megastep/makeself/releases/download/release-2.3.1/makeself-2.3.1.run
+	@cd $(CMAKE_BUILD_DIR) && chmod +x makeself-2.3.1.run
+	@cd $(CMAKE_BUILD_DIR) && ./makeself-2.3.1.run -q --nox11 1>/dev/null
+endif # if MAKESELF_2_3_1_FILE_PATH does not exist
+	@$(MAKESELF_2_3_1_FILE_PATH) --notemp --nox11 --gzip "$(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)" "$(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION).gz.run" "quetzalcoatlus Installer" echo "quetzalcoatlus Installation Done!" &> $(CMAKE_SOURCE_DIR)/makeself.log
+
+endif # CURRENT_BUILD_PLATFORM
+
 
 .PHONY: prune
 prune:
@@ -139,3 +187,6 @@ pristine:
 	git submodule update --init --recursive
 	git submodule foreach --recursive git reset --hard
 
+.PHONY: dummy
+dummy:
+	$(info doing nothing here.)

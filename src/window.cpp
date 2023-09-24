@@ -281,7 +281,7 @@ void Window::createSimpleGroupBox()
     simplePushButton = new QPushButton(tr("RightPushButton"));
     QObject::connect(simplePushButton, &QPushButton::released,
                      this,
-                     [this]() { 
+                     [this]() {
                         if(this->simplePushButton->text() == "RightPushButton") {
                             this->simplePushButton->setText("0");
                         }

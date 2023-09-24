@@ -2,3 +2,4 @@
 /install
 /deploy
 /.vscode
+*.log
