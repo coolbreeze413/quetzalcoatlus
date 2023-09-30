@@ -198,8 +198,8 @@ void Window::createSimpleGroupBox()
     simpleComboBox->addItem(QIcon(":/images/mars.svg"), "Mars");
     simpleComboBox->addItem(QIcon(":/images/jupiter.svg"), "Jupiter");
     simpleComboBox->addItem(QIcon(":/images/saturn.svg"), "Saturn");
-    simpleComboBox->addItem(QIcon(":/images/neptune.svg"), "Neptune");
     simpleComboBox->addItem(QIcon(":/images/uranus.svg"), "Uranus");
+    simpleComboBox->addItem(QIcon(":/images/neptune.svg"), "Neptune");
     simpleComboBox->setCurrentIndex(simpleComboBox->findText("Jupiter"));
 
     simpleSpinBoxLabel = new QLabel(tr("SpinBox"));
