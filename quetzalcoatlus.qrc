@@ -20,8 +20,10 @@
    <file alias="uranus.svg">resources/images/uranus.svg</file>
    <file alias="neptune.svg">resources/images/neptune.svg</file>
 </qresource>
+
 <qresource prefix="gif">
    <!-- https://svs.gsfc.nasa.gov/13326 -->
    <file alias="accretion_disk.gif">resources/gif/BH_Accretion_Disk_Sim_360_1080_320.gif</file>
 </qresource>
+
 </RCC>
