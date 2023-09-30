@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 
 
 #if QUETZALCOATLUS_USE_SPLASH_SCREEN
-    QPixmap pixmap(":splash/splash.jpg");
+    QPixmap pixmap = QIcon(":/images/logo.svg").pixmap(QSize(800,800));
     QSplashScreen splash(pixmap, Qt::SplashScreen | Qt::WindowStaysOnTopHint);
     splash.show();
     splash.showMessage(QObject::tr("Thinking..."), Qt::AlignBottom | Qt::AlignRight, Qt::black);

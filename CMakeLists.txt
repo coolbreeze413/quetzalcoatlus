@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.14)
 
 
 if(NOT DEFINED QUETZALCOATLUS_VERSION)
-    set(QUETZALCOATLUS_VERSION "v0.0.0-alpha")
+    set(QUETZALCOATLUS_VERSION "v0.0.0")
 endif()
 
 if(NOT DEFINED QUETZALCOATLUS_GIT_HASH)
@@ -55,12 +55,6 @@ set(QRC_FILES
     ${PROJECT_SOURCE_DIR}/quetzalcoatlus.qrc
 )
 
-# not using this yet.
-# set(RESOURCE_FILES
-#     "${PROJECT_SOURCE_DIR}/resources/images/quetzalcoatlus.jpg"
-# )
-
-
 # define the 'executable' target
 add_executable(quetzalcoatlus
     ${SOURCE_FILES}
@@ -89,7 +83,7 @@ target_link_libraries(quetzalcoatlus PUBLIC
 # test passing in configuration define via CMake
 #target_compile_definitions(quetzalcoatlus PUBLIC QUETZALCOATLUS_USE_SPLASH_SCREEN=0)
 
-# use QGridLayout to layout stuff
+# use QGridLayout to layout stuff or not
 target_compile_definitions(quetzalcoatlus PUBLIC QUETZALCOATLUS_USE_QGRIDLAYOUT=0)
 
 
@@ -125,7 +119,7 @@ install(
 
 install(
     FILES
-        resources/images/quetzalcoatlus_icon_256x256.png
+        resources/images/quetzalcoatlus_flying_outline_256x256.png
     DESTINATION
         share/icons/hicolor/256x256/apps
     RENAME

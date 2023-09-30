@@ -35,7 +35,7 @@ Window::Window()
     createSimpleGroupBox();
     createActions();
 
-    QIcon icon(":icons/logo.png");
+    QIcon icon(":/images/logo_256x256.png");
 
 #ifndef QT_NO_SYSTEMTRAYICON
     createTrayIcon();
@@ -120,11 +120,11 @@ void Window::closeEvent(QCloseEvent *event)
     // basically, did the user click the close button?
     if (event->spontaneous())
     {
-        qDebug() << "closeEvent() -> spontaneous()";
+        // qDebug() << "closeEvent() -> spontaneous()";
     }
     else
     {
-        qDebug() << "closeEvent() -> *NOT* spontaneous()";
+        // qDebug() << "closeEvent() -> *NOT* spontaneous()";
     }
     QMainWindow::closeEvent(event);
 }
@@ -151,7 +151,7 @@ void Window::iconActivated(QSystemTrayIcon::ActivationReason reason)
 void Window::showMessage()
 {
     QSystemTrayIcon::MessageIcon msgIcon = QSystemTrayIcon::MessageIcon(QSystemTrayIcon::Information);
-    QIcon icon(":/images/quetzalcoatlus.png");
+    QIcon icon(":/images/logo_256x256.png");
     trayIcon->showMessage("This is TITLE",
                           "This is BODY",
                           icon,
@@ -161,6 +161,7 @@ void Window::showMessage()
 
 void Window::messageClicked()
 {
+    qDebug() << "Window::messageClicked()";
     QMessageBox::information(nullptr,
                              tr("TITLE"),
                              tr("TEXT"));
@@ -188,27 +189,18 @@ void Window::createSimpleGroupBox()
 
     simpleComboBoxLabel = new QLabel(tr("ComboBox"));
     simpleComboBox = new QComboBox;
-#ifndef QT_NO_SYSTEMTRAYICON
-    simpleComboBox->addItem(tr("None"), QSystemTrayIcon::NoIcon);
-    simpleComboBox->addItem(style()->standardIcon(
-                                QStyle::SP_MessageBoxInformation),
-                            tr("Information"),
-                            QSystemTrayIcon::Information);
-    simpleComboBox->addItem(style()->standardIcon(
-                                QStyle::SP_MessageBoxWarning),
-                            tr("Warning"),
-                            QSystemTrayIcon::Warning);
-    simpleComboBox->addItem(style()->standardIcon(
-                                QStyle::SP_MessageBoxCritical),
-                            tr("Critical"),
-                            QSystemTrayIcon::Critical);
-#else // #ifndef QT_NO_SYSTEMTRAYICON
-    simpleComboBox->addItem(tr("One"), QString("One"));
-    simpleComboBox->addItem(tr("Two"), QString("Two"));
-    simpleComboBox->addItem(tr("Three"), QString("Three"));
-    simpleComboBox->addItem(tr("Four"), QString("Four"));
-#endif // #ifndef QT_NO_SYSTEMTRAYICON
-    simpleComboBox->setCurrentIndex(1);
+    simpleComboBox->setIconSize(QSize(120,100));
+    simpleComboBox->setStyleSheet("QComboBox { background-color: gray; color: black; }");
+    simpleComboBox->addItem(QIcon(":/images/sun.svg"), "Sun");
+    simpleComboBox->addItem(QIcon(":/images/mercury.svg"), "Mercury");
+    simpleComboBox->addItem(QIcon(":/images/venus.svg"), "Venus");
+    simpleComboBox->addItem(QIcon(":/images/earth.svg"), "Earth");
+    simpleComboBox->addItem(QIcon(":/images/mars.svg"), "Mars");
+    simpleComboBox->addItem(QIcon(":/images/jupiter.svg"), "Jupiter");
+    simpleComboBox->addItem(QIcon(":/images/saturn.svg"), "Saturn");
+    simpleComboBox->addItem(QIcon(":/images/neptune.svg"), "Neptune");
+    simpleComboBox->addItem(QIcon(":/images/uranus.svg"), "Uranus");
+    simpleComboBox->setCurrentIndex(simpleComboBox->findText("Jupiter"));
 
     simpleSpinBoxLabel = new QLabel(tr("SpinBox"));
     simpleSpinBox = new QSpinBox;
@@ -228,7 +220,7 @@ void Window::createSimpleGroupBox()
     simplePixmapLabelLabel = new QLabel(tr("PixmapLabel"));
     simplePixmapLabel = new QLabel();
     // pixmap from a svg, via QIcon (or use QIcon directly):
-    QPixmap p = QIcon(":/icons/black_hole.svg").pixmap(QSize(93,80)); // use original image w,h or multiple.
+    QPixmap p = QIcon(":/images/accretion_disk.svg").pixmap(QSize(93,80)); // use original image w,h or multiple.
     if(!p.isNull()) {
         simplePixmapLabel->setPixmap(p);
     }
@@ -241,7 +233,7 @@ void Window::createSimpleGroupBox()
     simplePixmapPushButtonLabel = new QLabel(tr("PixmapPushButton"));
     simplePixmapPushButton = new QPushButton();
     simplePixmapPushButton->setToolTip("Click to view an accretion disk!");
-    simplePixmapPushButton->setIcon(QIcon(":/icons/black_hole.svg"));
+    simplePixmapPushButton->setIcon(QIcon(":/images/accretion_disk.svg"));
     simplePixmapPushButton->setIconSize(QSize(93,80)); // use original image w,h or multiple.
     simplePixmapPushButton->setFixedSize(QSize(93+10,80+10));
     QObject::connect(simplePixmapPushButton, &QPushButton::released,

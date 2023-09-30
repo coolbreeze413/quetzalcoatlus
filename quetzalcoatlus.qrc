@@ -1,11 +1,24 @@
 <!DOCTYPE RCC><RCC version="1.0">
-<qresource prefix="icons">
-   <file alias="logo.png">resources/images/quetzalcoatlus_icon_512x512.png</file>
-   <!-- Creative Commons: Created by Hrvoje Tomic from the Noun Project-->
-   <file alias="black_hole.svg">resources/images/noun-black-hole-5551295.svg</file>
-</qresource>
-<qresource prefix="splash">
-   <file alias="splash.jpg">resources/images/quetzalcoatlus_865px.jpg</file>
+<qresource prefix="images">
+
+   <!-- Creative Commons: https://thenounproject.com/icon/quetzalcoatlus-4818424/ -->
+   <file alias="logo.svg">resources/images/quetzalcoatlus_flying_outline.svg</file>
+   <file alias="logo_256x256.png">resources/images/quetzalcoatlus_flying_outline_256x256.png</file>
+
+   <!-- Creative Commons: https://thenounproject.com/icon/black-hole-5551295/ -->
+   <file alias="accretion_disk.svg">resources/images/accretion_disk.svg</file>
+
+   <!-- FreePik License -->
+   <!-- https://www.freepik.com/free-vector/flat-universe-infographic-template_6359775.htm -->
+   <file alias="sun.svg">resources/images/sun.svg</file>
+   <file alias="mercury.svg">resources/images/mercury.svg</file>
+   <file alias="venus.svg">resources/images/venus.svg</file>
+   <file alias="earth.svg">resources/images/earth.svg</file>
+   <file alias="mars.svg">resources/images/mars.svg</file>
+   <file alias="jupiter.svg">resources/images/jupiter.svg</file>
+   <file alias="saturn.svg">resources/images/saturn.svg</file>
+   <file alias="uranus.svg">resources/images/uranus.svg</file>
+   <file alias="neptune.svg">resources/images/neptune.svg</file>
 </qresource>
 <qresource prefix="gif">
    <!-- https://svs.gsfc.nasa.gov/13326 -->
