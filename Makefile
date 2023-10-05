@@ -31,14 +31,34 @@ VERSION := v0.0.0
 endif
 
 
+GIT_REPO_URL := $(shell git remote get-url origin | sed -E 's,https\://api\:.+github,github,g')
+ifeq ($(GIT_REPO_URL),)
+GIT_REPO_URL := unknown_url
+endif
+$(info GIT_REPO_URL=$(GIT_REPO_URL))
+
+
 GIT_HASH := $(shell git rev-parse HEAD)
 ifeq ($(GIT_HASH),)
 GIT_HASH := zyxwvutsrqponmlkjihgfedcba
 endif
+$(info GIT_HASH=$(GIT_HASH))
 
 
 CURRENT_BRANCH := $(shell git symbolic-ref HEAD --short 2>/dev/null || echo "no_branch")
 $(info CURRENT_BRANCH=$(CURRENT_BRANCH))
+
+
+# Qt specific variables to choose a specific Qt installation.
+QMAKE_PATH ?=
+ifneq ($(QMAKE_PATH),)
+QMAKE_DIR_PATH := $(patsubst %/,%,$(dir $(QMAKE_PATH)))
+CMAKE_PREFIX_PATH := $(abspath $(QMAKE_DIR_PATH)/..)
+export PATH := $(CMAKE_PREFIX_PATH)/bin:$(PATH)
+$(info QMAKE_PATH=$(QMAKE_PATH))
+$(info CMAKE_PREFIX_PATH=$(CMAKE_PREFIX_PATH))
+$(info PATH=$(PATH))
+endif
 
 
 DEPLOY_PACKAGE_DIR_PATH := $(CMAKE_SOURCE_DIR)/deploy
@@ -63,7 +83,15 @@ install: run-cmake
 # phony target to force cmake run
 .PHONY: run-cmake
 run-cmake:
-	cmake -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DQUETZALCOATLUS_VERSION=$(VERSION) -DQUETZALCOATLUS_GIT_HASH=$(GIT_HASH) -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR)
+	cmake \
+		-DCMAKE_INSTALL_PREFIX=$(PREFIX) \
+		-DCMAKE_PREFIX_PATH=$(CMAKE_PREFIX_PATH) \
+		-DBUILD_DATE=$(CURRENT_DATE) \
+		-DBUILD_TIME=$(CURRENT_TIME) \
+		-DBUILD_VERSION=$(VERSION) \
+		-DBUILD_GIT_HASH=$(GIT_HASH) \
+		-DBUILD_GIT_REPO_URL=$(GIT_REPO_URL) \
+		-S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR)
 
 
 .PHONY: clean
@@ -160,3 +188,9 @@ endif
 .PHONY: dummy
 dummy:
 	$(info doing nothing here.)
+
+# examples:
+# make distclean
+# make deploy -j$(nproc) 2>&1 | tee build_default.log
+# make deploy -j$(nproc) QMAKE_PATH=/usr/lib/x86_64-linux-gnu/qt5/bin/qmake 2>&1 | tee build_5_12_8.log
+# make deploy -j$(nproc) QMAKE_PATH=/home/${USER}/qt/5.15.2/gcc_64/bin/qmake 2>&1 | tee build_5_15_2.log

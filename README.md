@@ -19,38 +19,76 @@ ADD MORE!
 
 Tested on Ubuntu 20.04 with:
 - default `apt` provided `Qt 5.12.8`
-- Qt Installer provided `Qt 5.15.2` ( base install path used: `/home/${USER}/qt` ==>> so, `5.15.2` path: `/home/${USER}/qt/5.15.2/gcc_64/` )
+- Qt Installer provided `Qt 5.15.2` ( base install path used: `/home/${USER}/qt` ==>> so, `5.15.2` path: `/home/${USER}/qt/5.15.2` )
+
+In general, it is recommended to use a base path like: `/home/${USER}/qt` or `/opt/qt` for installation, so it becomes easy to use the same build commands across different machines.
 
 
-### Build
+### Get Sources
 
-If the Qt Version is changed, using `CMAKE_PREFIX_PATH` we are mostly trying to use a separate non-distro-provided installation of Qt, using a Qt Installer.
-Recommended to use a base path like: `/home/${USER}/qt` for installation.
+Clone the repo as usual:
+```bash
+git clone https://github.com/coolbreeze413/quetzalcoatlus.git
+cd quetzalcoatlus
+```
 
-In this case, there are 2 things to do:
 
-1. Add the below line in `CMakeLists.txt`, and set path according to the installation on the system:
+### Build Local Install
 
-   ```cmake
-   list(PREPEND CMAKE_PREFIX_PATH "<path/to/parent/of/Qt/bin/and/lib>")
-   ```
+For distro provided installation of Qt, we can use:
 
-2. Ensure that we remove the CMake `build` directory to clear the cache and any artifact first:
+```bash
+make
+```
+
+
+If we want to use a separate non-distro-provided installation of Qt, using a Qt Installer, then:
+
+1. Ensure that we remove the CMake `build` directory once (if built earlier) to clear the cache and any artifacts first:
    
    ```bash
    make distclean
    ```
 
-and then build as usual:
+
+2. Call `make` with the `qmake` path of the desired Qt Installation to use:
+
+   ```bash
+   make QMAKE_PATH=/path/to/bin/qmake
+   ```
+
+   For example, if we have `Qt 5.15.2` installation at: `/home/${USER}/qt/5.15.2`  
+   Then, qmake path for gcc, x86_64 will be at: `/home/${USER}/qt/5.15.2/gcc_64/bin/qmake`  
+   and then we use:  
+   ```bash
+   make QMAKE_PATH=/home/${USER}/qt/5.15.2/gcc_64/bin/qmake
+   ```
+
+
+### Run Local Install
+
+For distro provided installation of Qt, we can use:
 
 ```bash
-git clone https://github.com/coolbreeze413/quetzalcoatlus.git
-cd quetzalcoatlus
-make
+./install/bin/quetzalcoatlus
 ```
 
 
-### Deploy
+If we want to use a separate non-distro-provided installation of Qt, using a Qt Installer, then to run the built application, set the `LD_LIBRARY_PATH` variable to the corresponding Qt install `lib/` path:
+
+```bash
+LD_LIBRARY_PATH=/path/to/qt/install/gcc_64/lib:$LD_LIBRARY_PATH ./install/bin/quetzalcoatlus
+```
+
+For example, if we have `Qt 5.15.2` installation at: `/home/${USER}/qt/5.15.2`  
+Then, lib path for gcc, x86_64 will be at: `/home/${USER}/qt/5.15.2/gcc_64/lib`  
+and then we use:  
+```bash
+LD_LIBRARY_PATH=/home/${USER}/qt/5.15.2/gcc_64/lib:$LD_LIBRARY_PATH ./install/bin/quetzalcoatlus
+```
+
+
+### Build `deploy` Package
 
 Currently, we use [linuxdeployqt](https://github.com/probonopd/linuxdeployqt) for creating a deploy package and an AppImage.
 
@@ -59,37 +97,51 @@ Note that, linuxdeployqt will add a `DT_RUNPATH`( == `$ORIGIN/../lib` )to the EL
 This can be seen by using `readelf -d ./quetzalcoatlus` in the deploy directory.
 ![quetzalcoatlus_readelf](./images/quetzalcoatlus_deploy_readelf.png)
 
+
+For distro provided installation of Qt, we can use:
+
 ```bash
 make deploy
 ```
 
-If the Qt Version is changed, using `CMAKE_PREFIX_PATH` we are mostly trying to use a separate non-distro-provided installation of Qt, using a Qt Installer.
-Recommended to use a base path like: `/home/${USER}/qt` for installation.
-
-In this case, we need to set the `$PATH` variable to ensure that linuxdeployqt can find the correct `qmake` to use for packaging, according to this: https://github.com/probonopd/linuxdeployqt#qmake-configuration
-
+If we want to use a separate non-distro-provided installation of Qt, using a Qt Installer, then call `make` with the `qmake` path of the desired Qt Installation to use:
 
 ```bash
-export PATH=<path/to/Qt/install/bin>:${PATH}
-make deploy
+make deploy QMAKE_PATH=/path/to/bin/qmake
 ```
 
-for example, if the Qt 5.15.2 installation is here: `/home/${USER}/qt/5.15.2/gcc_64/`
-then, use `export PATH=/home/${USER}/qt/5.15.2/gcc_64/bin:${PATH}`.
-
-
-### Run
+For example, if we have `Qt 5.15.2` installation at: `/home/${USER}/qt/5.15.2`  
+Then, qmake path for gcc, x86_64 will be at: `/home/${USER}/qt/5.15.2/gcc_64/bin/qmake`  
+and then we use:  
 ```bash
-install/bin/quetzalcoatlus
+make deploy QMAKE_PATH=/home/${USER}/qt/5.15.2/gcc_64/bin/qmake
 ```
 
-If the Qt Version is changed, using `CMAKE_PREFIX_PATH` we are mostly trying to use a separate non-distro-provided installation of Qt, using a Qt Installer.
+Internally, we set the `$PATH` variable to ensure that `linuxdeployqt` can find the correct `qmake` to use for packaging, according to this: https://github.com/probonopd/linuxdeployqt#qmake-configuration
 
-In this case, to run the built application, set the `LD_LIBRARY_PATH` variable, for example:
+
+
+### Run `deploy` Package
+
+#### `deploy` Package Directory
+
+The `deploy` package as a directory is available at: `deploy/quetzalcoatlus_<current_version>`
+
+To run from the deploy package directory, we don't need any special steps, for both distro provided Qt install or manually installed Qt installs:
 
 ```bash
-LD_LIBRARY_PATH=/home/${USER}/qt/5.15.2/gcc_64/lib:$LD_LIBRARY_PATH ./install/bin/squintymongrel
+cd deploy/quetzalcoatlus_<current_version>/bin
+./quetzalcoatlus
 ```
+
+#### `deploy` Package Tarball
+
+The deploy package is also available as a tarball that can be extracted and used as the directory usage above: `deploy/quetzalcoatlus_<current_version>.tar.gz`
+
+#### `deploy` Package AppImage
+
+There is also an AppImage created: `deploy/QuetzalCoatlus-${SHA1}-x86_64` which can just be run directly.  
+
 
 
 ## Attributions

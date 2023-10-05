@@ -25,6 +25,8 @@ project(quetzalcoatlus LANGUAGES CXX)
 
 # getting CMake to find the correct Qt packages...
 # recommend user to install new Qt version using installer to "/home/${USER}/qt"
+# pass in the CMAKE_PREFIX_PATH to be used by us from outside, i.e. the Makefile wrapper.
+# the following sections are only here for additional information.
 
 # rabbit hole 0: this works, reports correct Qt_VERSION from find_packages
 #                *and* includes correct headers, and links correct libraries
@@ -47,6 +49,7 @@ project(quetzalcoatlus LANGUAGES CXX)
 # set(Qt5_ROOT "/home/$ENV{USER}/qt/5.15.2/gcc_64" CACHE PATH "Initial cache" FORCE)
 # so we also set the version here.
 # set(Qt_VERSION 5 15 2)
+
 
 # note that find_package() populates the package_VERSION variable, as well as packagecomponent_VERSION variable.
 # this can be used for further checks as below.
@@ -125,11 +128,16 @@ target_link_libraries(quetzalcoatlus PUBLIC
 
 # compile time definitions for target:
 
-# pass in the version
-target_compile_definitions(quetzalcoatlus PUBLIC QUETZALCOATLUS_VERSION=${QUETZALCOATLUS_VERSION})
+# pass in the date and time
+target_compile_definitions(quetzalcoatlus PUBLIC BUILD_DATE=${BUILD_DATE})
+target_compile_definitions(quetzalcoatlus PUBLIC BUILD_TIME=${BUILD_TIME})
 
-# pass in the git hash
-target_compile_definitions(quetzalcoatlus PUBLIC QUETZALCOATLUS_GIT_HASH=${QUETZALCOATLUS_GIT_HASH})
+# pass in the version
+target_compile_definitions(quetzalcoatlus PUBLIC BUILD_VERSION=${BUILD_VERSION})
+
+# pass in the git details
+target_compile_definitions(quetzalcoatlus PUBLIC BUILD_GIT_REPO_URL=${BUILD_GIT_REPO_URL})
+target_compile_definitions(quetzalcoatlus PUBLIC BUILD_GIT_HASH=${BUILD_GIT_HASH})
 
 # to test how it would work when compiled on a platform with no tray icon support
 #target_compile_definitions(quetzalcoatlus PUBLIC QT_NO_SYSTEMTRAYICON=1)
