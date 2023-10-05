@@ -51,9 +51,31 @@ make
 
 
 ### Deploy
+
+Currently, we use [linuxdeployqt](https://github.com/probonopd/linuxdeployqt) for creating a deploy package and an AppImage.
+
+Note that, linuxdeployqt will add a `DT_RUNPATH`( == `$ORIGIN/../lib` )to the ELF so that the libraries can be found without explicitly setting `LD_LIBRARY_PATH` while running the binary from the `deploy` package.
+
+This can be seen by using `readelf -d ./quetzalcoatlus` in the deploy directory.
+![quetzalcoatlus_readelf](./images/quetzalcoatlus_deploy_readelf.png)
+
 ```bash
 make deploy
 ```
+
+If the Qt Version is changed, using `CMAKE_PREFIX_PATH` we are mostly trying to use a separate non-distro-provided installation of Qt, using a Qt Installer.
+Recommended to use a base path like: `/home/${USER}/qt` for installation.
+
+In this case, we need to set the `$PATH` variable to ensure that linuxdeployqt can find the correct `qmake` to use for packaging, according to this: https://github.com/probonopd/linuxdeployqt#qmake-configuration
+
+
+```bash
+export PATH=<path/to/Qt/install/bin>:${PATH}
+make deploy
+```
+
+for example, if the Qt 5.15.2 installation is here: `/home/${USER}/qt/5.15.2/gcc_64/`
+then, use `export PATH=/home/${USER}/qt/5.15.2/gcc_64/bin:${PATH}`.
 
 
 ### Run
