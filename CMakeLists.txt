@@ -1,6 +1,7 @@
 
 cmake_minimum_required(VERSION 3.14)
 
+message("\n\n")
 
 if(NOT DEFINED QUETZALCOATLUS_VERSION)
     set(QUETZALCOATLUS_VERSION "v0.0.0")
@@ -14,7 +15,6 @@ if(NOT DEFINED CMAKE_INSTALL_PREFIX)
     set(CMAKE_INSTALL_PREFIX  ${CMAKE_CURRENT_SOURCE_DIR}/install)
 endif(NOT DEFINED CMAKE_INSTALL_PREFIX)
 
-message("CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
 message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 message("QUETZALCOATLUS_VERSION: ${QUETZALCOATLUS_VERSION}")
 message("QUETZALCOATLUS_GIT_HASH: ${QUETZALCOATLUS_GIT_HASH}")
@@ -23,8 +23,55 @@ message("QUETZALCOATLUS_GIT_HASH: ${QUETZALCOATLUS_GIT_HASH}")
 project(quetzalcoatlus LANGUAGES CXX)
 
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Gui Widgets REQUIRED)
+# getting CMake to find the correct Qt packages...
+# recommend user to install new Qt version using installer to "/home/${USER}/qt"
+
+# rabbit hole 0: this works, reports correct Qt_VERSION from find_packages
+#                *and* includes correct headers, and links correct libraries
+# use this line and *modify* it for the system *only* if we are using non-distro-provided Qt!
+# *note* that, for non-distro-provided Qt, running application will need the LD_LIBRARY_PATH set as well:
+# example: LD_LIBRARY_PATH=/home/${USER}/qt/5.15.2/gcc_64/lib:$LD_LIBRARY_PATH ./install/bin/squintymongrel
+#
+# this path should be the 'root' path for the correct platform, containing the bin/ and lib/ directories
+# list(PREPEND CMAKE_PREFIX_PATH "/home/$ENV{USER}/qt/5.15.2/gcc_64")
+# list(PREPEND CMAKE_PREFIX_PATH "/usr/lib/x86_64-linux-gnu/qt5")
+
+# rabbit hole 1: does not work
+# even with Qt_DIR or Qt5_DIR or other variations
+# set(Qt_DIR "/home/$ENV{USER}/qt/5.15.2/gcc_64/lib/cmake/Qt5" CACHE PATH "Initial cache" FORCE)
+# set(Qt_DIR "/usr/lib/x86_64-linux-gnu/cmake/Qt5")
+
+# rabbit hole 2: does not work
+# the following works i.e. includes and link libraries are correct, but strangely 
+#     does *not* affect the *version* reported by find_package!
+# set(Qt5_ROOT "/home/$ENV{USER}/qt/5.15.2/gcc_64" CACHE PATH "Initial cache" FORCE)
+# so we also set the version here.
+# set(Qt_VERSION 5 15 2)
+
+# note that find_package() populates the package_VERSION variable, as well as packagecomponent_VERSION variable.
+# this can be used for further checks as below.
+find_package(Qt NAMES Qt5 COMPONENTS Core REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Widgets WebEngineWidgets WebChannel REQUIRED)
+# package_VERSION
+message("Qt Version: " ${Qt_VERSION})
+# message("Qt5 Version: " ${Qt5_VERSION})
+# packagecomponent_VERSION
+# message("Qt5Core Version: " ${Qt5Core_VERSION})
+# message("Qt5Widgets Version: " ${Qt5Widgets_VERSION})
+
+
+# https://itecnote.com/tecnote/qt-test-for-supported-qt-version-with-cmake/
+# https://cmake.org/cmake/help/latest/variable/CMAKE_VERSION.html
+if (Qt_FOUND)
+    if (Qt_VERSION VERSION_GREATER 5.12.8)
+        # for Qt 5.15.2: https://bugreports.qt.io/browse/QTBUG-80964
+        if (UNIX)
+            message("\n  Qt_VERSION > 5.12.8: " ${Qt_VERSION} ", enabling gold linker!")
+            set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=gold")
+        endif()
+    endif()
+endif()
+
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -71,12 +118,19 @@ target_include_directories(quetzalcoatlus
 
 # libs for target
 target_link_libraries(quetzalcoatlus PUBLIC
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Gui
-    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${Qt_VERSION_MAJOR}::Core
+    Qt${Qt_VERSION_MAJOR}::Gui
+    Qt${Qt_VERSION_MAJOR}::Widgets
 )
 
-# compile time definitions for target
+# compile time definitions for target:
+
+# pass in the version
+target_compile_definitions(quetzalcoatlus PUBLIC QUETZALCOATLUS_VERSION=${QUETZALCOATLUS_VERSION})
+
+# pass in the git hash
+target_compile_definitions(quetzalcoatlus PUBLIC QUETZALCOATLUS_GIT_HASH=${QUETZALCOATLUS_GIT_HASH})
+
 # to test how it would work when compiled on a platform with no tray icon support
 #target_compile_definitions(quetzalcoatlus PUBLIC QT_NO_SYSTEMTRAYICON=1)
 
@@ -126,3 +180,5 @@ install(
         quetzalcoatlus.png
     PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
 )
+
+message("\n\n")

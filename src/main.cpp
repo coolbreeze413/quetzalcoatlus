@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <QApplication>
+#include <QDebug>
 #include <QMessageBox>
 #include <QSplashScreen>
 #include <QTimer>
@@ -8,10 +9,42 @@
 #include "quetzalcoatlus_config.h"
 #include "window.h"
 
+// https://stackoverflow.com/questions/240353/convert-a-preprocessor-token-to-a-string
+// https://gcc.gnu.org/onlinedocs/gcc-13.2.0/cpp/Stringizing.html
+// if we have '#define foo abcd', then:
+// step 1: TOSTRING(foo)  fully macro-expanded -> TOSTRING(abcd) -> STRINGIFY(abcd)
+#define TOSTRING(x) STRINGIFY(x)
+// step 2: STRINGIFY(abcd) -> replaced by "abcd" and not macro expanded because it is stringized with '#'
+#define STRINGIFY(x) #x
+
+
+// example usage for checking version for includes
+// remember to #include <QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets>
+#else
+#include <QtGui>
+#endif
+
+
 int main(int argc, char *argv[])
 {
     // initialize the Qt resource system ('quetzalcoatlus.qrc')
     Q_INIT_RESOURCE(quetzalcoatlus);
+
+
+    // https://stackoverflow.com/questions/52256264/qt-version-incorrect
+    qDebug() << "";
+    qDebug() << "Application Version           :" << "quetzalcoatlus" << TOSTRING(QUETZALCOATLUS_VERSION);
+    qDebug() << "Git SHA1                      :" << TOSTRING(QUETZALCOATLUS_GIT_HASH);
+    qDebug() << "built with Qt Version (string):" << QT_VERSION_STR;
+    qDebug() << "built with Qt Version (hex)   :"
+             << (((QT_VERSION) >> 16) & 0xff)
+             << (((QT_VERSION) >> 8) & 0xff)
+             << ((QT_VERSION) & 0xff);
+    qDebug() << "runtime Qt Version (string)   :" << qVersion();
+    qDebug() << "";
+
 
     // https://doc.qt.io/qt-5/highdpi.html
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
