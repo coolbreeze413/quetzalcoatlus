@@ -28,6 +28,7 @@
 #include <QSpacerItem>
 #include <QStatusBar>
 #include <QMenuBar>
+#include <QDialogButtonBox>
 
 #include <iostream>
 #include <regex>
@@ -612,6 +613,14 @@ void Window::about() {
 
     QLabel* gitHashLabel = new QLabel(TOSTRING(BUILD_GIT_HASH));
     dialogLayout->addWidget(gitHashLabel, 0, Qt::AlignRight);
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    QObject::connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+    dialogLayout->addWidget(buttonBox, 0, Qt::AlignRight);
+
+    // disallow resizing, but still adjust to content size.
+    // https://stackoverflow.com/questions/696209/non-resizeable-qdialog-with-fixed-size-in-qt
+    dialogLayout->setSizeConstraint( QLayout::SetFixedSize );
 
     dialog->setModal(true);
     dialog->exec();
