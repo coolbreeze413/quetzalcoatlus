@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <QApplication>
+#include <QtGlobal>
 #include <QDebug>
+#include <QApplication>
 #include <QMessageBox>
 #include <QSplashScreen>
 #include <QTimer>

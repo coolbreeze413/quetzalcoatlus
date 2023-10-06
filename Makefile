@@ -29,6 +29,7 @@ VERSION := $(shell git describe --tags --abbrev=0)
 ifeq ($(VERSION),)
 VERSION := v0.0.0
 endif
+$(info VERSION=$(VERSION))
 
 
 GIT_REPO_URL := $(shell git remote get-url origin | sed -E 's,https\://api\:.+github,github,g')
@@ -77,7 +78,9 @@ install: run-cmake
 #$(MAKE) pre-install
 	$(MAKE) -C build install
 #$(MAKE) post-install
-	@echo "local install ready."
+	@echo
+	@echo
+	@echo "local install ready:" $(shell realpath --relative-to="$(CMAKE_SOURCE_DIR)" "$(PREFIX)")"/bin/quetzalcoatlus"
 
 
 # phony target to force cmake run
@@ -194,3 +197,4 @@ dummy:
 # make deploy -j$(nproc) 2>&1 | tee build_default.log
 # make deploy -j$(nproc) QMAKE_PATH=/usr/lib/x86_64-linux-gnu/qt5/bin/qmake 2>&1 | tee build_5_12_8.log
 # make deploy -j$(nproc) QMAKE_PATH=/home/${USER}/qt/5.15.2/gcc_64/bin/qmake 2>&1 | tee build_5_15_2.log
+
