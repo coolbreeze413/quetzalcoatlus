@@ -26,15 +26,28 @@
 #include <QProgressDialog>
 #include <QDebug>
 #include <QSpacerItem>
+#include <QStatusBar>
+#include <QMenuBar>
 
 #include <iostream>
 #include <regex>
 #include <fstream>
 
+
+// https://stackoverflow.com/questions/240353/convert-a-preprocessor-token-to-a-string
+// https://gcc.gnu.org/onlinedocs/gcc-13.2.0/cpp/Stringizing.html
+// if we have '#define foo abcd', then:
+// step 1: TOSTRING(foo)  fully macro-expanded -> TOSTRING(abcd) -> STRINGIFY(abcd)
+#define TOSTRING(x) STRINGIFY(x)
+// step 2: STRINGIFY(abcd) -> replaced by "abcd" and not macro expanded because it is stringized with '#'
+#define STRINGIFY(x) #x
+
+
 Window::Window()
 {
     createSimpleGroupBox();
     createActions();
+    createMenus();
 
     QIcon icon(":/images/logo_256x256.png");
 
@@ -60,6 +73,9 @@ Window::Window()
 
     // finally adjust ourself to position centered and an appropriate size
     setPositionAndSize();
+
+    statusBar()->showMessage(tr("I am hungry"));
+
 }
 
 void Window::setVisible(bool visible)
@@ -536,6 +552,21 @@ void Window::createActions()
 
     quitAction = new QAction(tr("&Quit"), this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+
+    aboutAct = new QAction(tr("&About"), this);
+    aboutAct->setStatusTip(tr("Show information about quetzalcoatlus"));
+    connect(aboutAct, &QAction::triggered, this, &Window::about);
+
+    aboutQtAct = new QAction(tr("About &Qt"), this);
+    aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
+    connect(aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt);
+}
+
+
+void Window::createMenus() {
+    helpMenu = menuBar()->addMenu(tr("&Help"));
+    helpMenu->addAction(aboutAct);
+    helpMenu->addAction(aboutQtAct);
 }
 
 
@@ -547,4 +578,43 @@ void Window::selectFile() {
                                                nullptr,
                                                QFileDialog::DontUseNativeDialog);
     fileSelectTextEdit->setText(QDir(QDir::currentPath()).filePath(logfilepath));
+}
+
+
+void Window::about() {
+
+    QDialog* dialog = new QDialog(this);
+
+    dialog->setWindowTitle("About quetzalcoatlus");
+
+    QVBoxLayout* dialogLayout = new QVBoxLayout();
+    dialog->setLayout(dialogLayout);
+
+    QLabel* logoLabel = new QLabel();
+    // pixmap from a svg, via QIcon (or use QIcon directly):
+    QPixmap p = QIcon(":/images/logo.svg").pixmap(QSize(256,256)); // use original image w,h or multiple.
+    if(!p.isNull()) {
+        logoLabel->setPixmap(p);
+    }
+    dialogLayout->addWidget(logoLabel, 0, Qt::AlignCenter);
+
+    QLabel* versionLabel = new QLabel(TOSTRING(BUILD_VERSION));
+    dialogLayout->addWidget(versionLabel, 0, Qt::AlignRight);
+
+    QLabel* dateLabel = new QLabel(TOSTRING(BUILD_DATE));
+    dialogLayout->addWidget(dateLabel, 0, Qt::AlignRight);
+
+    QLabel* timeLabel = new QLabel(TOSTRING(BUILD_TIME));
+    dialogLayout->addWidget(timeLabel, 0, Qt::AlignRight);
+
+    QLabel* repoURLLabel = new QLabel(TOSTRING(BUILD_GIT_REPO_URL));
+    dialogLayout->addWidget(repoURLLabel, 0, Qt::AlignRight);
+
+    QLabel* gitHashLabel = new QLabel(TOSTRING(BUILD_GIT_HASH));
+    dialogLayout->addWidget(gitHashLabel, 0, Qt::AlignRight);
+
+    dialog->setModal(true);
+    dialog->exec();
+
+    dialog->deleteLater();
 }

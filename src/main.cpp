@@ -10,6 +10,7 @@
 #include "quetzalcoatlus_config.h"
 #include "window.h"
 
+
 // https://stackoverflow.com/questions/240353/convert-a-preprocessor-token-to-a-string
 // https://gcc.gnu.org/onlinedocs/gcc-13.2.0/cpp/Stringizing.html
 // if we have '#define foo abcd', then:

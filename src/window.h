@@ -41,10 +41,12 @@ private slots:
     void messageClicked();
 #endif
     void selectFile();
+    void about();
 
 private:
     void createSimpleGroupBox();
     void createActions();
+    void createMenus();
 #ifndef QT_NO_SYSTEMTRAYICON
     void createTrayIcon();
 #endif
@@ -83,6 +85,10 @@ private:
     QAction *maximizeAction;
     QAction *restoreAction;
     QAction *quitAction;
+    QAction *aboutAct;
+    QAction *aboutQtAct;
+
+    QMenu *helpMenu;
 
 #ifndef QT_NO_SYSTEMTRAYICON
     QSystemTrayIcon *trayIcon;
