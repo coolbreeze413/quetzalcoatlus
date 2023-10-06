@@ -49,10 +49,14 @@ int main(int argc, char *argv[])
     qDebug() << "";
 
 
+#if (QT_VERSION < QT_VERSION_CHECK(6, 5, 3))
     // https://doc.qt.io/qt-5/highdpi.html
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     // Qt5 only: Make QIcon::pixmap() generate high-dpi pixmaps that can be larger than the requested size.
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#else
+    // the Qt::AA_EnableHighDpiScaling and Qt::AA_UseHighDpiPixmaps are always enabled in Qt6 and deprecated.
+#endif
 
     QApplication app(argc, argv);
 

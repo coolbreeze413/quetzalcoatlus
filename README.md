@@ -64,6 +64,13 @@ If we want to use a separate non-distro-provided installation of Qt, using a Qt 
    make QMAKE_PATH=/home/${USER}/qt/5.15.2/gcc_64/bin/qmake
    ```
 
+   For example, if we have `Qt 6.5.3` installation at: `/home/${USER}/qt/6.5.3`  
+   Then, qmake path for gcc, x86_64 will be at: `/home/${USER}/qt/6.5.3/gcc_64/bin/qmake`  
+   and then we use:  
+   ```bash
+   make QMAKE_PATH=/home/${USER}/qt/6.5.3/gcc_64/bin/qmake
+   ```
+
 
 ### Run Local Install
 
@@ -87,6 +94,12 @@ and then we use:
 LD_LIBRARY_PATH=/home/${USER}/qt/5.15.2/gcc_64/lib:$LD_LIBRARY_PATH ./install/bin/quetzalcoatlus
 ```
 
+For example, if we have `Qt 6.5.3` installation at: `/home/${USER}/qt/6.5.3`  
+Then, lib path for gcc, x86_64 will be at: `/home/${USER}/qt/6.5.3/gcc_64/lib`  
+and then we use:  
+```bash
+LD_LIBRARY_PATH=/home/${USER}/qt/6.5.3/gcc_64/lib:$LD_LIBRARY_PATH ./install/bin/quetzalcoatlus
+```
 
 ### Build `deploy` Package
 
@@ -115,6 +128,13 @@ Then, qmake path for gcc, x86_64 will be at: `/home/${USER}/qt/5.15.2/gcc_64/bin
 and then we use:  
 ```bash
 make deploy QMAKE_PATH=/home/${USER}/qt/5.15.2/gcc_64/bin/qmake
+```
+
+For example, if we have `Qt 6.5.3` installation at: `/home/${USER}/qt/6.5.3`  
+Then, qmake path for gcc, x86_64 will be at: `/home/${USER}/qt/6.5.3/gcc_64/bin/qmake`  
+and then we use:  
+```bash
+make deploy QMAKE_PATH=/home/${USER}/qt/6.5.3/gcc_64/bin/qmake
 ```
 
 Internally, we set the `$PATH` variable to ensure that `linuxdeployqt` can find the correct `qmake` to use for packaging, according to this: https://github.com/probonopd/linuxdeployqt#qmake-configuration

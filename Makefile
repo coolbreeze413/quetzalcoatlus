@@ -197,4 +197,5 @@ dummy:
 # make deploy -j$(nproc) 2>&1 | tee build_default.log
 # make deploy -j$(nproc) QMAKE_PATH=/usr/lib/x86_64-linux-gnu/qt5/bin/qmake 2>&1 | tee build_5_12_8.log
 # make deploy -j$(nproc) QMAKE_PATH=/home/${USER}/qt/5.15.2/gcc_64/bin/qmake 2>&1 | tee build_5_15_2.log
+# make deploy -j$(nproc) QMAKE_PATH=/home/${USER}/qt/6.5.3/gcc_64/bin/qmake 2>&1 | tee build_6_5_3.log
 

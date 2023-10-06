@@ -252,8 +252,11 @@ void Window::createSimpleGroupBox()
                         QMovie* selectedGif = new QMovie(":/gif/accretion_disk.gif");
                         gifContainerLabel->setMovie(selectedGif);
                         gifContainerDialogLayout->addWidget(gifContainerLabel);
-
+#if (QT_VERSION < QT_VERSION_CHECK(6, 5, 3))
                         gifContainerDialogLayout->setMargin(0);
+#else
+                        gifContainerDialogLayout->setContentsMargins(0, 0, 0, 0);
+#endif
 
                         // disallow resizing, but still adjust to content size.
                         // https://stackoverflow.com/questions/696209/non-resizeable-qdialog-with-fixed-size-in-qt
