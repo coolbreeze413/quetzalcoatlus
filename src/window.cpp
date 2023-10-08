@@ -591,28 +591,41 @@ void Window::about() {
     QVBoxLayout* dialogLayout = new QVBoxLayout();
     dialog->setLayout(dialogLayout);
 
+    QHBoxLayout* logoAndAppInfoHBoxLayout = new QHBoxLayout();
     QLabel* logoLabel = new QLabel();
     // pixmap from a svg, via QIcon (or use QIcon directly):
-    QPixmap p = QIcon(":/images/logo.svg").pixmap(QSize(256,256)); // use original image w,h or multiple.
+    QPixmap p = QIcon(":/images/logo.svg").pixmap(QSize(100,100)); // use original image w,h or multiple.
     if(!p.isNull()) {
         logoLabel->setPixmap(p);
     }
-    dialogLayout->addWidget(logoLabel, 0, Qt::AlignCenter);
+    logoAndAppInfoHBoxLayout->addWidget(logoLabel, 0, Qt::AlignCenter);
 
-    QLabel* versionLabel = new QLabel(TOSTRING(BUILD_VERSION));
-    dialogLayout->addWidget(versionLabel, 0, Qt::AlignRight);
+    QVBoxLayout* appInfoVBoxLayout = new QVBoxLayout();
+    QLabel* versionLabel = new QLabel(QString(TOSTRING(BUILD_VERSION)));
+    appInfoVBoxLayout->addWidget(versionLabel, 0, Qt::AlignLeft);
 
-    QLabel* dateLabel = new QLabel(TOSTRING(BUILD_DATE));
-    dialogLayout->addWidget(dateLabel, 0, Qt::AlignRight);
+    QLabel* datetimeLabel = new QLabel(QString(TOSTRING(BUILD_DATE)).replace("_", " ") + " " + QString(TOSTRING(BUILD_TIME)).replace("_", ":"));
+    appInfoVBoxLayout->addWidget(datetimeLabel, 0, Qt::AlignLeft);
 
-    QLabel* timeLabel = new QLabel(TOSTRING(BUILD_TIME));
-    dialogLayout->addWidget(timeLabel, 0, Qt::AlignRight);
+    QLabel* repoURLLabel = new QLabel();
+    repoURLLabel->setText(QString("<a href=\"https://") + QString(TOSTRING(BUILD_GIT_REPO_URL)) + QString("\">coolbreeze413/quetzalcoatlus</a>"));
+    repoURLLabel->setTextFormat(Qt::RichText);
+    repoURLLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    repoURLLabel->setOpenExternalLinks(true);
+    appInfoVBoxLayout->addWidget(repoURLLabel, 0, Qt::AlignLeft);
 
-    QLabel* repoURLLabel = new QLabel(TOSTRING(BUILD_GIT_REPO_URL));
-    dialogLayout->addWidget(repoURLLabel, 0, Qt::AlignRight);
+    QString gitHashString = QString(TOSTRING(BUILD_GIT_HASH));
+    gitHashString.truncate(9);
+    QLabel* gitHashLabel = new QLabel(gitHashString);
+    appInfoVBoxLayout->addWidget(gitHashLabel, 0, Qt::AlignLeft);
 
-    QLabel* gitHashLabel = new QLabel(TOSTRING(BUILD_GIT_HASH));
-    dialogLayout->addWidget(gitHashLabel, 0, Qt::AlignRight);
+    appInfoVBoxLayout->addStretch();
+    logoAndAppInfoHBoxLayout->addLayout(appInfoVBoxLayout);
+
+    dialogLayout->addLayout(logoAndAppInfoHBoxLayout);
+
+
+    
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     QObject::connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
