@@ -73,7 +73,8 @@ Window::Window()
     setWindowIcon(icon);
 
     // finally adjust ourself to position centered and an appropriate size
-    setPositionAndSize();
+    // this involves calling 'show()' and should be controlled from outside.
+    // setPositionAndSize();
 
     statusBar()->showMessage(tr("I am hungry"));
 

@@ -26,8 +26,9 @@ class Window : public QMainWindow
 
 public:
     Window();
-
     void setVisible(bool visible) override;
+
+public slots:
     void setPositionAndSize();
 
 protected:
