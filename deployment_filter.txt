@@ -11,6 +11,7 @@
 # - if the path is a directory, it will be copied recursively to the deployment directory
 ########################################################
 ^\./bin/quetzalcoatlus$
+^\./bin/quetzalcoatlus\.exe$
 ^\./scripts$
 ^\./share/quetzalcoatlus$
 ^\./share/applications$

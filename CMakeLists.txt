@@ -45,7 +45,7 @@ project(quetzalcoatlus LANGUAGES CXX)
 # note that find_package() populates the package_VERSION variable, as well as packagecomponent_VERSION variable.
 # this can be used for further checks as below.
 find_package(Qt NAMES Qt5 Qt6 COMPONENTS Core REQUIRED)
-find_package(Qt${Qt_VERSION_MAJOR} COMPONENTS Core Gui Widgets WebEngineWidgets WebChannel REQUIRED)
+find_package(Qt${Qt_VERSION_MAJOR} COMPONENTS Core Gui Widgets REQUIRED)
 # package_VERSION
 message("Qt Version: " ${Qt_VERSION})
 # message("Qt${Qt_VERSION_MAJOR} Version: " ${Qt${Qt_VERSION_MAJOR}_VERSION})
