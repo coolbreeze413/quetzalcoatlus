@@ -303,7 +303,7 @@ ifeq ($(BUILD_PLATFORM),$(filter $(BUILD_PLATFORM),$(SUPPORTED_MSYS2_BUILD_PLATF
 
 	@echo "creating deployment package using windeployqt..."
 	@windeployqt $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/bin/quetzalcoatlus.exe --no-translations
-	@echo "creating aurora2 zip using 7-Zip..."
+	@echo "creating 7z archive using 7-Zip..."
 ifeq ("$(wildcard $(SEVENZIP_FILE_PATH))","")
 	@mkdir -p $(SEVENZIP_DIR_PATH)
 	@wget --quiet https://www.7-zip.org/a/7zr.exe --directory-prefix=$(SEVENZIP_DIR_PATH)
