@@ -11,7 +11,7 @@ endif(NOT DEFINED CMAKE_INSTALL_PREFIX)
 message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 
 
-project(quetzalcoatlus LANGUAGES CXX)
+project(${APPLICATION_NAME} LANGUAGES CXX)
 
 
 # getting CMake to find the correct Qt packages...
@@ -93,25 +93,25 @@ set(SOURCE_FILES
 )
 
 set(QRC_FILES
-    ${PROJECT_SOURCE_DIR}/quetzalcoatlus.qrc
+    ${PROJECT_SOURCE_DIR}/${APPLICATION_NAME}.qrc
 )
 
 # define the 'executable' target
-add_executable(quetzalcoatlus
+add_executable(${APPLICATION_NAME}
     ${SOURCE_FILES}
     ${QRC_FILES}
 )
 
 # can set a custom output_name for the binary file produced
-set_target_properties(quetzalcoatlus PROPERTIES OUTPUT_NAME quetzalcoatlus)
+set_target_properties(${APPLICATION_NAME} PROPERTIES OUTPUT_NAME ${APPLICATION_NAME})
 
 # include dirs for target
-target_include_directories(quetzalcoatlus
+target_include_directories(${APPLICATION_NAME}
     PRIVATE
     ${PROJECT_SOURCE_DIR}/src)
 
 # libs for target
-target_link_libraries(quetzalcoatlus PUBLIC
+target_link_libraries(${APPLICATION_NAME} PUBLIC
     Qt${Qt_VERSION_MAJOR}::Core
     Qt${Qt_VERSION_MAJOR}::Gui
     Qt${Qt_VERSION_MAJOR}::Widgets
@@ -119,25 +119,26 @@ target_link_libraries(quetzalcoatlus PUBLIC
 
 # compile time definitions for target:
 
+target_compile_definitions(${APPLICATION_NAME} PUBLIC APPLICATION_NAME=${APPLICATION_NAME})
+
 # pass in the date and time
-target_compile_definitions(quetzalcoatlus PUBLIC BUILD_DATE=${BUILD_DATE})
-target_compile_definitions(quetzalcoatlus PUBLIC BUILD_TIME=${BUILD_TIME})
+target_compile_definitions(${APPLICATION_NAME} PUBLIC BUILD_DATE=${BUILD_DATE})
 
 # pass in the version
-target_compile_definitions(quetzalcoatlus PUBLIC BUILD_VERSION=${BUILD_VERSION})
+target_compile_definitions(${APPLICATION_NAME} PUBLIC BUILD_VERSION=${BUILD_VERSION})
 
 # pass in the git details
-target_compile_definitions(quetzalcoatlus PUBLIC BUILD_GIT_REPO_URL=${BUILD_GIT_REPO_URL})
-target_compile_definitions(quetzalcoatlus PUBLIC BUILD_GIT_HASH=${BUILD_GIT_HASH})
+target_compile_definitions(${APPLICATION_NAME} PUBLIC BUILD_GIT_REPO_URL=${BUILD_GIT_REPO_URL})
+target_compile_definitions(${APPLICATION_NAME} PUBLIC BUILD_GIT_HASH=${BUILD_GIT_HASH})
 
 # to test how it would work when compiled on a platform with no tray icon support
-#target_compile_definitions(quetzalcoatlus PUBLIC QT_NO_SYSTEMTRAYICON=1)
+#target_compile_definitions(${APPLICATION_NAME} PUBLIC QT_NO_SYSTEMTRAYICON=1)
 
 # test passing in configuration define via CMake
-#target_compile_definitions(quetzalcoatlus PUBLIC QUETZALCOATLUS_USE_SPLASH_SCREEN=0)
+#target_compile_definitions(${APPLICATION_NAME} PUBLIC ${APPLICATION_NAME}_USE_SPLASH_SCREEN=0)
 
 # use QGridLayout to layout stuff or not
-target_compile_definitions(quetzalcoatlus PUBLIC QUETZALCOATLUS_USE_QGRIDLAYOUT=0)
+target_compile_definitions(${APPLICATION_NAME} PUBLIC ${APPLICATION_NAME}_USE_QGRIDLAYOUT=0)
 
 
 # debug:
@@ -149,7 +150,7 @@ target_compile_definitions(quetzalcoatlus PUBLIC QUETZALCOATLUS_USE_QGRIDLAYOUT=
 # set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 
-install(TARGETS quetzalcoatlus
+install(TARGETS ${APPLICATION_NAME}
     RUNTIME DESTINATION bin
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
@@ -159,7 +160,7 @@ install(TARGETS quetzalcoatlus
 
 install(
     FILES
-        resources/quetzalcoatlus.desktop
+        resources/${APPLICATION_NAME}.desktop
     DESTINATION
         share/applications
     PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
@@ -167,11 +168,11 @@ install(
 
 install(
     FILES
-        resources/images/quetzalcoatlus_flying_outline_256x256.png
+        resources/images/${APPLICATION_NAME}_flying_outline_256x256.png
     DESTINATION
         share/icons/hicolor/256x256/apps
     RENAME
-        quetzalcoatlus.png
+        ${APPLICATION_NAME}.png
     PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
 )
 
@@ -179,7 +180,7 @@ install(
     DIRECTORY
         testfiles
     DESTINATION
-        share/quetzalcoatlus/
+        share/${APPLICATION_NAME}/
 )
 
 message("\n\n")

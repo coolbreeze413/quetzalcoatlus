@@ -150,6 +150,10 @@ CMAKE_GENERATOR ?= "Unix Makefiles"
 endif # $(BUILD_PLATFORM) logic
 
 
+APPLICATION_NAME := quetzalcoatlus
+APPLICATION_BINARY_NAME := quetzalcoatlus # not used yet.
+
+
 VERSION := $(shell git describe --tags --abbrev=0)
 ifeq ($(VERSION),)
 VERSION := v0.0.0
@@ -189,13 +193,23 @@ $(info PATH=$(PATH))
 endif
 
 
-DEPLOY_PACKAGE_DIR_PATH := $(CMAKE_SOURCE_DIR)/deploy
+DEPLOY_PACKAGE_BASE_DIR_PATH := $(CMAKE_SOURCE_DIR)/deploy
+ifeq ($(BUILD_PLATFORM),$(filter $(BUILD_PLATFORM),$(SUPPORTED_MSYS2_BUILD_PLATFORMS)))
 
-# variables required for building delpoy package
+DEPLOY_PACKAGE_NAME := $(APPLICATION_NAME)_$(VERSION)_windows-x64
+
+else ifeq ($(BUILD_PLATFORM),$(filter $(BUILD_PLATFORM),$(SUPPORTED_LINUX_BUILD_PLATFORMS)))
+
+DEPLOY_PACKAGE_NAME := $(APPLICATION_NAME)_$(VERSION)_linux-x64
+
+endif # $(BUILD_PLATFORM) logic
+DEPLOY_PACKAGE_DIR_PATH := $(DEPLOY_PACKAGE_BASE_DIR_PATH)/$(DEPLOY_PACKAGE_NAME)
+
+
+# variables required for building deploy package
 ifeq ($(BUILD_PLATFORM),$(filter $(BUILD_PLATFORM),$(SUPPORTED_MSYS2_BUILD_PLATFORMS)))
 
 export SEVENZIP_DIR_PATH := $(CMAKE_BUILD_DIR)/7zip
-export SEVENZIP_R_FILE_PATH := $(SEVENZIP_DIR_PATH)/7zr.exe
 export SEVENZIP_FILE_PATH := $(SEVENZIP_DIR_PATH)/7z.exe
 # 7-Zip needs the SFX path to be in windows format, and it should have "\\" delimiters(treated as a string)
 export SEVENZIP_SFX_FILE_PATH_W=$(shell cygpath -w "$(SEVENZIP_DIR_PATH)/7z.sfx" | sed 's/\\/\\\\/g')
@@ -226,7 +240,7 @@ install: run-cmake
 #$(MAKE) post-install
 	@echo
 	@echo
-	@echo "local install ready:" $(shell realpath --relative-to="$(CMAKE_SOURCE_DIR)" "$(PREFIX)")"/bin/quetzalcoatlus"
+	@echo "local install ready:" $(shell realpath --relative-to="$(CMAKE_SOURCE_DIR)" "$(PREFIX)/bin/$(APPLICATION_NAME)")
 
 
 # phony target to force cmake run
@@ -235,6 +249,7 @@ run-cmake:
 	cmake -G $(CMAKE_GENERATOR) \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX) \
 		-DCMAKE_PREFIX_PATH=$(CMAKE_PREFIX_PATH) \
+		-DAPPLICATION_NAME=$(APPLICATION_NAME) \
 		-DBUILD_DATE=$(CURRENT_DATE) \
 		-DBUILD_VERSION=$(VERSION) \
 		-DBUILD_GIT_HASH=$(GIT_HASH) \
@@ -260,7 +275,7 @@ else
 endif
 	@rm -rf $(CMAKE_BUILD_DIR)
 	@rm -rf $(PREFIX)
-	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)
+	@rm -rf $(DEPLOY_PACKAGE_BASE_DIR_PATH)
 
 
 # https://github.com/AppImage/AppImageKit/wiki/AppDir
@@ -269,58 +284,62 @@ deploy: install
 
 ifeq ($(BUILD_PLATFORM),$(filter $(BUILD_PLATFORM),$(SUPPORTED_MSYS2_BUILD_PLATFORMS)))
 
-	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)
-	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)
-	@cd $(PREFIX) && find . | grep -f $(CMAKE_SOURCE_DIR)/deployment_filter.txt | xargs -d '\n' cp -r --parents -t $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)
+	@rm -rf $(DEPLOY_PACKAGE_BASE_DIR_PATH)
+	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)
+	@cd $(PREFIX) && find . | grep -f $(CMAKE_SOURCE_DIR)/deployment_filter.txt | xargs -d '\n' cp -r --parents -t $(DEPLOY_PACKAGE_DIR_PATH)
 	@echo "detect and copy all libs into lib/..."
-	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/lib
-	@for f in `ldd $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/bin/quetzalcoatlus.exe | cut -d' ' -f 3 | grep $(MSYSTEM_LC) | uniq`; do cp -fv $$f $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/lib; done
+	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)/lib
+	@for f in `ldd $(DEPLOY_PACKAGE_DIR_PATH)/bin/$(APPLICATION_NAME).exe | cut -d' ' -f 3 | grep $(MSYSTEM_LC) | uniq`; do cp -fv $$f $(DEPLOY_PACKAGE_DIR_PATH)/lib; done
 	@echo "move all libs into bin/..."
-	@cp -fv $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/lib/* $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/bin
-	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/lib
+	@cp -fv $(DEPLOY_PACKAGE_DIR_PATH)/lib/* $(DEPLOY_PACKAGE_DIR_PATH)/bin
+	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/lib
 
 # # for GTK3 applications, we need to copy additional files:
 # # reference for additional dll files: https://github.com/microsoft/vcpkg/issues/9936
 # 	@echo "copy libs/configs for gtk3..."
-# 	@cp -v /$(MSYSTEM_LC)/bin/liblzma-5.dll $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/bin
-# 	@cp -v /$(MSYSTEM_LC)/bin/librsvg-2-2.dll $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/bin
-# 	@cp -v /$(MSYSTEM_LC)/bin/libxml2-2.dll $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/bin
+# 	@cp -v /$(MSYSTEM_LC)/bin/liblzma-5.dll $(DEPLOY_PACKAGE_DIR_PATH)/bin
+# 	@cp -v /$(MSYSTEM_LC)/bin/librsvg-2-2.dll $(DEPLOY_PACKAGE_DIR_PATH)/bin
+# 	@cp -v /$(MSYSTEM_LC)/bin/libxml2-2.dll $(DEPLOY_PACKAGE_DIR_PATH)/bin
 # # reference for additional gdbus.exe: https://discourse.gnome.org/t/gtk-warning-about-gdbus-exe-not-being-found-on-windows-msys2/2893
-# 	@cp -v /$(MSYSTEM_LC)/bin/gdbus.exe $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/bin
+# 	@cp -v /$(MSYSTEM_LC)/bin/gdbus.exe $(DEPLOY_PACKAGE_DIR_PATH)/bin
 # # reference for gdk/glib/icons/mime: 
 # # https://copyprogramming.com/howto/how-do-i-distribute-a-gtkmm-application-on-windows#problems-with-deploying-a-gtk-application
 # # https://www.gtk.org/docs/installations/windows#building-and-distributing-your-application
-# 	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/lib
-# 	@cp -r /$(MSYSTEM_LC)/lib/gdk-pixbuf-2.0 $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/lib
-# 	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/share/glib-2.0
-# 	@cp -r /$(MSYSTEM_LC)/share/glib-2.0/schemas $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/share/glib-2.0
-# 	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/share/icons
-# 	@cp -r /$(MSYSTEM_LC)/share/icons/Adwaita $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/share/icons
-# 	@cp -r /$(MSYSTEM_LC)/share/icons/hicolor $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/share/icons
-# 	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/share/mime
-# 	@cp -r /$(MSYSTEM_LC)/share/mime/magic $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/share/mime
+# 	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)/lib
+# 	@cp -r /$(MSYSTEM_LC)/lib/gdk-pixbuf-2.0 $(DEPLOY_PACKAGE_DIR_PATH)/lib
+# 	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)/share/glib-2.0
+# 	@cp -r /$(MSYSTEM_LC)/share/glib-2.0/schemas $(DEPLOY_PACKAGE_DIR_PATH)/share/glib-2.0
+# 	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)/share/icons
+# 	@cp -r /$(MSYSTEM_LC)/share/icons/Adwaita $(DEPLOY_PACKAGE_DIR_PATH)/share/icons
+# 	@cp -r /$(MSYSTEM_LC)/share/icons/hicolor $(DEPLOY_PACKAGE_DIR_PATH)/share/icons
+# 	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)/share/mime
+# 	@cp -r /$(MSYSTEM_LC)/share/mime/magic $(DEPLOY_PACKAGE_DIR_PATH)/share/mime
 
 	@echo "creating deployment package using windeployqt..."
-	@windeployqt $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)/bin/quetzalcoatlus.exe --no-translations
+	@windeployqt $(DEPLOY_PACKAGE_DIR_PATH)/bin/$(APPLICATION_NAME).exe --no-translations
 	@echo "creating 7z archive using 7-Zip..."
 ifeq ("$(wildcard $(SEVENZIP_FILE_PATH))","")
 	@mkdir -p $(SEVENZIP_DIR_PATH)
+# get the 7zr.exe basic cmdline extraction util, so we can extract all content from the full 7z installer
 	@wget --quiet https://www.7-zip.org/a/7zr.exe --directory-prefix=$(SEVENZIP_DIR_PATH)
+# get the full 7z installer
 	@wget --quiet https://www.7-zip.org/a/7z2301-x64.exe --directory-prefix=$(SEVENZIP_DIR_PATH)
+# extract the content from the full 7z installer (gives us 7z.exe + all SFX files to use)
 	@cd $(SEVENZIP_DIR_PATH) && \
 	$(SEVENZIP_DIR_PATH)/7zr.exe x $(SEVENZIP_DIR_PATH)/7z2301-x64.exe -y > /dev/null
 endif # if $(SEVENZIP_FILE_PATH) does not exist
-	@cd $(DEPLOY_PACKAGE_DIR_PATH) && \
-	$(SEVENZIP_FILE_PATH) a -mx3 -t7z quetzalcoatlus_$(VERSION).7z quetzalcoatlus_$(VERSION) > /dev/null
-	@echo "[msys2] deploy ready:" $(shell realpath -m --relative-to="$(CMAKE_SOURCE_DIR)" "$(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION).7z")
+# create 7z archive using the full 7z exe
+	@cd $(DEPLOY_PACKAGE_BASE_DIR_PATH) && \
+	$(SEVENZIP_FILE_PATH) a -mx3 -t7z $(DEPLOY_PACKAGE_NAME).7z $(DEPLOY_PACKAGE_NAME) > /dev/null
+	@echo "[msys2] deploy ready:" $(shell realpath -m --relative-to="$(CMAKE_SOURCE_DIR)" "$(DEPLOY_PACKAGE_BASE_DIR_PATH)/$(DEPLOY_PACKAGE_NAME).7z")
 
 else ifeq ($(BUILD_PLATFORM),$(filter $(BUILD_PLATFORM),$(SUPPORTED_LINUX_BUILD_PLATFORMS)))
 
-# create a fresh 'AppDir' : $(DEPLOY_PACKAGE_DIR_PATH)/usr/bin and $(DEPLOY_PACKAGE_DIR_PATH)/usr/lib
-	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)
-	@mkdir -p $(DEPLOY_PACKAGE_DIR_PATH)/usr
+# create a fresh 'AppDir' : $(DEPLOY_PACKAGE_BASE_DIR_PATH)/usr/bin and $(DEPLOY_PACKAGE_BASE_DIR_PATH)/usr/lib
+	@rm -rf $(DEPLOY_PACKAGE_BASE_DIR_PATH)
+	@mkdir -p $(DEPLOY_PACKAGE_BASE_DIR_PATH)/usr
 # copy the build into the 'AppDir'/usr, use a filter as needed, to put stuff into the deploy package
-	@cd $(PREFIX) && find . | grep -f $(CMAKE_SOURCE_DIR)/deployment_filter.txt | xargs -d '\n' cp -r --parents -t $(DEPLOY_PACKAGE_DIR_PATH)/usr
+	@cd $(PREFIX) && find . | grep -f $(CMAKE_SOURCE_DIR)/deployment_filter.txt | xargs -d '\n' cp -r --parents -t $(DEPLOY_PACKAGE_BASE_DIR_PATH)/usr
 # copy docs into 'AppDir'/usr/docs
 
 # create 'AppImage' using linuxdeployqt
@@ -333,20 +352,20 @@ ifeq ("$(wildcard $(LINUXDEPLOYQT_APPIMAGE_FILE_PATH))","")
 	@mkdir -p $(CMAKE_BUILD_DIR)/linuxdeployqt
 	@cd $(CMAKE_BUILD_DIR)/linuxdeployqt && $(LINUXDEPLOYQT_APPIMAGE_FILE_PATH) --appimage-extract
 endif # if LINUXDEPLOYQT_APPIMAGE_FILE_PATH does not exist
-	@cd $(DEPLOY_PACKAGE_DIR_PATH) && $(LINUXDEPLOYQT_APPRUN_FILE_PATH) $(DEPLOY_PACKAGE_DIR_PATH)/usr/share/applications/quetzalcoatlus.desktop -appimage -no-translations &> $(CMAKE_SOURCE_DIR)/linuxdeployqt.log
+	@cd $(DEPLOY_PACKAGE_BASE_DIR_PATH) && $(LINUXDEPLOYQT_APPRUN_FILE_PATH) $(DEPLOY_PACKAGE_BASE_DIR_PATH)/usr/share/applications/$(APPLICATION_NAME).desktop -appimage -no-translations &> $(CMAKE_SOURCE_DIR)/linuxdeployqt.log
 
 # remove the artifacts from linuxdeployqt
-	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/AppRun
-	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus.desktop
-	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus.png
-	@rm -rf $(DEPLOY_PACKAGE_DIR_PATH)/.DirIcon
+	@rm -rf $(DEPLOY_PACKAGE_BASE_DIR_PATH)/AppRun
+	@rm -rf $(DEPLOY_PACKAGE_BASE_DIR_PATH)/$(APPLICATION_NAME).desktop
+	@rm -rf $(DEPLOY_PACKAGE_BASE_DIR_PATH)/$(APPLICATION_NAME).png
+	@rm -rf $(DEPLOY_PACKAGE_BASE_DIR_PATH)/.DirIcon
 # rename the 'AppDir'/usr into the application name and this is our 'portable' deploy package
-	@mv $(DEPLOY_PACKAGE_DIR_PATH)/usr $(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION)
+	@mv $(DEPLOY_PACKAGE_BASE_DIR_PATH)/usr $(DEPLOY_PACKAGE_NAME)
 
 # create a tarball archive
 	@echo "creating deployable tar.gz package..."
-	@cd $(DEPLOY_PACKAGE_DIR_PATH) && tar -cvzf quetzalcoatlus_$(VERSION).tar.gz quetzalcoatlus_$(VERSION)
-	@echo "[linux] deploy ready:" $(shell realpath -m --relative-to="$(CMAKE_SOURCE_DIR)" "$(DEPLOY_PACKAGE_DIR_PATH)/quetzalcoatlus_$(VERSION).tar.gz")
+	@cd $(DEPLOY_PACKAGE_BASE_DIR_PATH) && tar -cvzf $(DEPLOY_PACKAGE_NAME).tar.gz $(DEPLOY_PACKAGE_NAME)
+	@echo "[linux] deploy ready:" $(shell realpath -m --relative-to="$(CMAKE_SOURCE_DIR)" "$(DEPLOY_PACKAGE_DIR_PATH)/$(DEPLOY_PACKAGE_NAME).tar.gz")
 
 endif # $(BUILD_PLATFORM) logic
 

@@ -17,12 +17,16 @@ ADD MORE!
 
 ### Platforms
 
-Tested on Ubuntu 20.04 with:
+#### Ubuntu 20.04
+
 - default `apt` provided `Qt 5.12.8`
 - Qt Installer provided `Qt 5.15.2` ( base install path used: `/home/${USER}/qt` ==>> so, `5.15.2` path: `/home/${USER}/qt/5.15.2` )
 
 In general, it is recommended to use a base path like: `/home/${USER}/qt` or `/opt/qt` for installation, so it becomes easy to use the same build commands across different machines.
 
+#### Windows 10/11
+
+- build with MSYS2 MINGW64 supported as of now, with Qt5.
 
 ### Get Sources
 
