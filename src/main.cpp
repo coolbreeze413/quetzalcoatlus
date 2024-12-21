@@ -10,6 +10,10 @@
 #include "quetzalcoatlus_config.h"
 #include "window.h"
 
+#if (defined(__MINGW32__))
+#include <windows.h>  // for FreeConsole()
+#endif
+
 
 // https://stackoverflow.com/questions/240353/convert-a-preprocessor-token-to-a-string
 // https://gcc.gnu.org/onlinedocs/gcc-13.2.0/cpp/Stringizing.html
@@ -37,7 +41,7 @@ int main(int argc, char *argv[])
 
     // https://stackoverflow.com/questions/52256264/qt-version-incorrect
     qDebug() << "";
-    qDebug() << "Application Version           :" << "quetzalcoatlus" << TOSTRING(BUILD_VERSION);
+    qDebug() << "Application Version           :" << TOSTRING(APPLICATION_NAME) << TOSTRING(BUILD_VERSION);
     qDebug() << "Built                         :" << TOSTRING(BUILD_DATE);
     qDebug() << "Git Repo URL                  :" << TOSTRING(BUILD_GIT_REPO_URL);
     qDebug() << "Git SHA1                      :" << TOSTRING(BUILD_GIT_HASH);
@@ -59,35 +63,50 @@ int main(int argc, char *argv[])
     // the Qt::AA_EnableHighDpiScaling and Qt::AA_UseHighDpiPixmaps are always enabled in Qt6 and deprecated.
 #endif
 
-    QApplication app(argc, argv);
 
-#ifndef QT_NO_SYSTEMTRAYICON
-    if (!QSystemTrayIcon::isSystemTrayAvailable()) {
-        QMessageBox::warning(nullptr, 
-                             QObject::tr("quetzalcoatlus"),
-                             QObject::tr("system tray not available on this system!"));
-        return 1;
+    // command-line parsing and stuff here.
+    bool batch_mode = 0;
+
+    if(batch_mode) {
+        QCoreApplication app(argc, argv);
+        // execute commands...
+        exit(0);
+        return app.exec();
     }
+    else {
+#if (defined(__MINGW32__))
+  FreeConsole();  // Closes the console window, but it still shows for a small instant.
+#endif
+        QApplication app(argc, argv);
+#ifndef QT_NO_SYSTEMTRAYICON
+        if (!QSystemTrayIcon::isSystemTrayAvailable()) {
+            QMessageBox::warning(nullptr, 
+                                QObject::tr("quetzalcoatlus"),
+                                QObject::tr("system tray not available on this system!"));
+            return 1;
+        }
 #endif // #ifndef QT_NO_SYSTEMTRAYICON
 
 
 #if QUETZALCOATLUS_USE_SPLASH_SCREEN
-    QPixmap pixmap = QIcon(":/images/logo.svg").pixmap(QSize(800,800));
-    QSplashScreen splash(pixmap, Qt::SplashScreen | Qt::WindowStaysOnTopHint);
-    splash.show();
-    splash.windowHandle()->setScreen(QGuiApplication::screenAt(QCursor::pos()));
-    splash.showMessage(QObject::tr("Thinking..."), Qt::AlignBottom | Qt::AlignRight, Qt::gray);
-    QTimer::singleShot(2600, &splash, &QWidget::close); // keep displayed for ~3 seconds
+        QPixmap pixmap = QIcon(":/images/logo.svg").pixmap(QSize(800,800));
+        QSplashScreen splash(pixmap, Qt::SplashScreen | Qt::WindowStaysOnTopHint);
+        splash.show();
+        splash.windowHandle()->setScreen(QGuiApplication::screenAt(QCursor::pos()));
+        splash.showMessage(QObject::tr("Thinking..."), Qt::AlignBottom | Qt::AlignRight, Qt::gray);
+        QTimer::singleShot(2600, &splash, &QWidget::close); // keep displayed for ~3 seconds
 #endif // #if QUETZALCOATLUS_USE_SPLASH_SCREEN
 
-    Window window;
+        Window window;
 
 #if QUETZALCOATLUS_USE_SPLASH_SCREEN
-    QTimer::singleShot(2650, &window, &QWidget::show); // show the main window after splash
-    QTimer::singleShot(2650, &window, &Window::setPositionAndSize); // adjust size and position
+        QTimer::singleShot(2650, &window, &QWidget::show); // show the main window after splash
+        QTimer::singleShot(2650, &window, &Window::setPositionAndSize); // adjust size and position
 #else
-    window.show();
-    window.setPositionAndSize();
+        window.show();
+        window.setPositionAndSize();
 #endif // #if QUETZALCOATLUS_USE_SPLASH_SCREEN
-    return app.exec();
+
+        return app.exec();
+    }
 }
