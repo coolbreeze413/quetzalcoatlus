@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     // https://stackoverflow.com/questions/52256264/qt-version-incorrect
     qDebug() << "";
     qDebug() << "Application Version           :" << "quetzalcoatlus" << TOSTRING(BUILD_VERSION);
-    qDebug() << "Built                         :" << TOSTRING(BUILD_DATE) << TOSTRING(BUILD_TIME);
+    qDebug() << "Built                         :" << TOSTRING(BUILD_DATE);
     qDebug() << "Git Repo URL                  :" << TOSTRING(BUILD_GIT_REPO_URL);
     qDebug() << "Git SHA1                      :" << TOSTRING(BUILD_GIT_HASH);
     qDebug() << "built with Qt Version (string):" << QT_VERSION_STR;

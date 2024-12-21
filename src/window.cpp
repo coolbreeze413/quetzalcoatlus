@@ -605,7 +605,7 @@ void Window::about() {
     QLabel* versionLabel = new QLabel(QString(TOSTRING(BUILD_VERSION)));
     appInfoVBoxLayout->addWidget(versionLabel, 0, Qt::AlignLeft);
 
-    QLabel* datetimeLabel = new QLabel(QString(TOSTRING(BUILD_DATE)).replace("_", " ") + " " + QString(TOSTRING(BUILD_TIME)).replace("_", ":"));
+    QLabel* datetimeLabel = new QLabel(QString(TOSTRING(BUILD_DATE)).replace("_", " "));
     appInfoVBoxLayout->addWidget(datetimeLabel, 0, Qt::AlignLeft);
 
     QLabel* repoURLLabel = new QLabel();
