@@ -90,6 +90,8 @@ set(SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/main.cpp
     ${PROJECT_SOURCE_DIR}/src/window.cpp
     ${PROJECT_SOURCE_DIR}/src/window.h
+    ${PROJECT_SOURCE_DIR}/src/udp_handler_widget.cpp
+    ${PROJECT_SOURCE_DIR}/src/udp_handler_widget.h
 )
 
 set(QRC_FILES

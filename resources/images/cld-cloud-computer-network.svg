@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   width="800px"
+   height="800px"
+   viewBox="0 0 64 64"
+   version="1.1"
+   id="svg64555"
+   sodipodi:docname="cld-cloud-computer-network.svg"
+   inkscape:version="1.1.1 (1:1.1+202109281949+c3084ef5ed)"
+   inkscape:export-filename="/home/coolbreeze413/Downloads/cld-cloud-computer-network.png"
+   inkscape:export-xdpi="15.36"
+   inkscape:export-ydpi="15.36"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview64557"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="0.35620504"
+     inkscape:cx="145.98334"
+     inkscape:cy="631.65866"
+     inkscape:window-width="1920"
+     inkscape:window-height="1000"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg64555" />
+  <title
+     id="title64533">cld-cloud-computer-network</title>
+  <desc
+     id="desc64535">Created with Sketch.</desc>
+  <defs
+     id="defs64537">
+    <rect
+       x="160.19758"
+       y="116.58537"
+       width="99.452697"
+       height="58.36102"
+       id="rect68341" />
+  </defs>
+  <metadata
+     id="metadata64616">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>cld-cloud-computer-network</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="g79864">
+    <g
+       id="SLICES-64px"
+       transform="translate(-720,-200)"
+       style="fill:none;fill-rule:evenodd;stroke:none;stroke-width:1" />
+    <g
+       id="cld-cloud-computer-network"
+       transform="translate(5,5)"
+       style="fill:none;fill-rule:evenodd;stroke:none;stroke-width:1">
+      <path
+         d="m 24,49 c 0,1.657 -1.343,3 -3,3 H 3 C 1.343,52 0,50.657 0,49 v -1 h 24 z"
+         id="Fill-439"
+         fill="#c0ccdb" />
+      <path
+         id="Fill-440"
+         style="fill:#e9effa"
+         d="M 2,48 H 22 V 36 H 2 Z" />
+      <path
+         d="m 52,49 c 0,1.657 -1.343,3 -3,3 H 31 c -1.657,0 -3,-1.343 -3,-3 v -1 h 24 z"
+         id="Fill-441"
+         fill="#c0ccdb" />
+      <path
+         id="Fill-442"
+         style="fill:#e9effa"
+         d="M 30,48 H 50 V 36 H 30 Z" />
+      <path
+         id="Stroke-444"
+         style="stroke:#414547;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"
+         d="M 2,48 V 36 h 20 v 12" />
+      <path
+         id="Stroke-445"
+         style="stroke:#414547;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"
+         d="M 30,48 V 36 h 20 v 12" />
+      <path
+         d="m 24,49 c 0,1.657 -1.343,3 -3,3 H 3 C 1.343,52 0,50.657 0,49 v -1 h 24 z"
+         id="Stroke-446"
+         stroke="#414547"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round" />
+      <path
+         d="m 52,49 c 0,1.657 -1.343,3 -3,3 H 31 c -1.657,0 -3,-1.343 -3,-3 v -1 h 24 z"
+         id="Stroke-447"
+         stroke="#414547"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round" />
+      <path
+         id="Stroke-448"
+         style="stroke:#414547;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"
+         d="m 12,32 v -6 h 28 v 6" />
+    </g>
+    <g
+       aria-label="UDP"
+       transform="matrix(0.61303664,0,0,0.61303664,-92.68905,-65.510807)"
+       id="text68339"
+       style="font-size:40px;line-height:1.25;white-space:pre;shape-inside:url(#rect68341);fill:#333333;stroke-width:0.130498">
+      <path
+         d="m 187.0332,123.47321 v 18.47656 q 0,3.16407 -1.42578,5.54688 -1.40625,2.38281 -4.08203,3.65234 -2.67578,1.26953 -6.32812,1.26953 -5.50782,0 -8.55469,-2.8125 -3.04688,-2.83203 -3.04688,-7.73437 v -18.39844 h 6.03516 v 17.48047 q 0,3.30078 1.32812,4.84375 1.32813,1.54297 4.39454,1.54297 2.96875,0 4.29687,-1.54297 1.34766,-1.5625 1.34766,-4.88281 v -17.44141 z"
+         style="font-weight:bold;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'"
+         id="path80000" />
+      <path
+         d="m 217.7168,137.47712 q 0,7.05078 -4.02344,10.80078 -4.00391,3.75 -11.58203,3.75 h -8.08594 v -28.55469 h 8.96484 q 6.99219,0 10.85938,3.69141 3.86719,3.6914 3.86719,10.3125 z m -6.28907,0.15625 q 0,-9.19922 -8.125,-9.19922 h -3.22265 v 18.59375 h 2.59765 q 8.75,0 8.75,-9.39453 z"
+         style="font-weight:bold;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'"
+         id="path80002" />
+      <path
+         d="m 229.68945,136.91071 h 1.99219 q 2.79297,0 4.17969,-1.09375 1.38672,-1.11328 1.38672,-3.22265 0,-2.12891 -1.17188,-3.14454 -1.15234,-1.01562 -3.63281,-1.01562 h -2.75391 z m 13.67188,-4.53125 q 0,4.60938 -2.89063,7.05078 -2.87109,2.44141 -8.18359,2.44141 h -2.59766 v 10.15625 h -6.05468 v -28.55469 h 9.12109 q 5.19531,0 7.89062,2.2461 2.71485,2.22656 2.71485,6.66015 z"
+         style="font-weight:bold;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'"
+         id="path80004" />
+    </g>
+  </g>
+</svg>

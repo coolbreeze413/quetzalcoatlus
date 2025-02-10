@@ -6,6 +6,8 @@
 #include <QSystemTrayIcon>
 #include <QMainWindow>
 
+#include "udp_handler_widget.h"
+
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -71,6 +73,10 @@ private:
 
     QLabel *simplePixmapPushButtonLabel;
     QPushButton *simplePixmapPushButton;
+
+    QLabel *udpHandlerPushButtonLabel;
+    QPushButton *udpHandlerPushButton;
+    UDPHandlerWidget* udpHandlerWidget;
 
     QPushButton *simplePushButton;
     QPushButton *regexPushButton;

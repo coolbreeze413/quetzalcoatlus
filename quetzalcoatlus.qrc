@@ -19,6 +19,8 @@
    <file alias="saturn.svg">resources/images/saturn.svg</file>
    <file alias="uranus.svg">resources/images/uranus.svg</file>
    <file alias="neptune.svg">resources/images/neptune.svg</file>
+
+   <file alias="udp.svg">resources/images/cld-cloud-computer-network.svg</file>
 </qresource>
 
 <qresource prefix="gif">

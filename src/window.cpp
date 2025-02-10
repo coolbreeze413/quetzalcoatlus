@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include "window.h"
+#include "udp_handler_widget.h"
 
 #include <QApplication>
 #include <QGuiApplication>
@@ -344,6 +345,23 @@ void Window::createSimpleGroupBox()
                      }
                     );
 
+
+    udpHandlerPushButtonLabel = new QLabel(tr("UDP Handler"));
+    udpHandlerPushButton = new QPushButton();
+    udpHandlerPushButton->setToolTip("Click to invoke the UDP Handler Window!");
+    udpHandlerPushButton->setIcon(QIcon(":/images/udp.svg"));
+    udpHandlerPushButton->setIconSize(QSize(128,128)); // use original image w,h or multiple.
+    udpHandlerPushButton->setFixedSize(QSize(128+10,128+10));
+    udpHandlerWidget = new UDPHandlerWidget();
+    QObject::connect(udpHandlerPushButton, &QPushButton::released,
+                     this,
+                     [this]() {
+                        
+                        udpHandlerWidget->show();
+                     }
+                    );
+
+
 #ifndef QT_NO_SYSTEMTRAYICON
     simpleCheckBox = new QCheckBox(tr("Minimize To Tray?"));
     simpleCheckBox->setChecked(false);
@@ -522,6 +540,13 @@ void Window::createSimpleGroupBox()
     regexPushButtonLayout->addStretch(19);
     regexPushButtonLayout->addWidget(regexPushButton, 1);
     simpleGroupBoxLayout->addLayout(regexPushButtonLayout);
+
+    QHBoxLayout* udpHandlerPushButtonLayout = new QHBoxLayout();
+    udpHandlerPushButtonLabel->setMinimumWidth(200);
+    udpHandlerPushButtonLayout->addWidget(udpHandlerPushButtonLabel, 1);
+    udpHandlerPushButtonLayout->addWidget(udpHandlerPushButton, 2);
+    udpHandlerPushButtonLayout->addStretch(17);
+    simpleGroupBoxLayout->addLayout(udpHandlerPushButtonLayout);
 
 
     // create a gap between other content and last row:
